@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<!-- MathJax for LaTeX support -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="实时阴影的作业：homework1耗时：3天作业内容是使用WebGL代码框架，实现PCF与PCSS软阴影
+1.PCF的实现
+12345678910111213141516171819202122232425262728// ShadingPoint to Light. Try to find the"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="EauDouceFish"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="GAMES202-实时阴影-作业1"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="实时阴影的作业：homework1耗时：3天作业内容是使用WebGL代码框架，实现PCF与PCSS软阴影
+1.PCF的实现
+12345678910111213141516171819202122232425262728// ShadingPoint to Light. Try to find the"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="淡水鱼的山间客栈"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>GAMES202-实时阴影-作业1 - 淡水鱼的山间客栈</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">EauDouceFish's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories">
+                            
+                                Categories
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GAMES202-实时阴影-作业1</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2025-06-14
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/GAMES202/">#GAMES202</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                        
+
+<a href="/categories/GAMES202/">GAMES202</a>
+
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <h1 id="实时阴影的作业：homework1"><a href="#实时阴影的作业：homework1" class="headerlink" title="实时阴影的作业：homework1"></a>实时阴影的作业：homework1</h1><p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_001.png" alt="实现效果图"><br>耗时：3天<br>作业内容是使用WebGL代码框架，实现PCF与PCSS软阴影</p>
+<p>1.PCF的实现</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ShadingPoint to Light. Try to find the shadowMap&#x27;s range</span></span><br><span class="line"><span class="comment">// zReceiver 是接收光照表面点的深度值</span></span><br><span class="line"><span class="type">float</span> findBlocker( <span class="type">sampler2D</span> shadowMap, <span class="type">vec2</span> uv, <span class="type">float</span> zReceiver ) &#123;</span><br><span class="line">  <span class="comment">// 声明参数</span></span><br><span class="line">  <span class="type">float</span> blockerTinyCount = <span class="number">0.0</span>;</span><br><span class="line">  <span class="type">float</span> totalBlockerDepth = <span class="number">0.0</span>;</span><br><span class="line">  <span class="comment">// 第一步 先对uv进行泊松圆盘采样</span></span><br><span class="line">  poissonDiskSamples(uv);</span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt; NUM_SAMPLES; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="type">float</span> blockerSearch = zReceiver * Light_SIZE / CAMERA_SIZE / <span class="number">2.0</span>;</span><br><span class="line">    <span class="comment">// poissonDisk[i] * 5.0/ RESOLUTION;</span></span><br><span class="line">    <span class="type">vec4</span> shadowColor = <span class="built_in">texture2D</span>(shadowMap, uv + poissonDisk[i] * blockerSearch);</span><br><span class="line">    <span class="type">float</span> shadowDepth = unpack(shadowColor);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 该微小部分在阴影中</span></span><br><span class="line">    <span class="keyword">if</span>(zReceiver &gt; shadowDepth)&#123;</span><br><span class="line">      blockerTinyCount++;</span><br><span class="line">      totalBlockerDepth += shadowDepth;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 不在范围内return 1;</span></span><br><span class="line">  <span class="keyword">if</span>(blockerTinyCount - <span class="type">float</span>(NUM_SAMPLES) &lt;= EPS) <span class="keyword">return</span> <span class="number">1.0</span>;</span><br><span class="line">  <span class="keyword">if</span>(blockerTinyCount &lt;= EPS) <span class="keyword">return</span> <span class="number">0.0</span>;</span><br><span class="line">  <span class="comment">// 最后返回平均深度</span></span><br><span class="line">  <span class="type">float</span> averageBlockerDepth = totalBlockerDepth / blockerTinyCount;</span><br><span class="line">  <span class="keyword">return</span> averageBlockerDepth;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> PCF(<span class="type">sampler2D</span> shadowMap, <span class="type">vec4</span> coords, <span class="type">float</span> filterSize) &#123;</span><br><span class="line">  <span class="comment">// 先声明一下要用到的变量:最终返回的阴影值（可见度）visibility</span></span><br><span class="line">  <span class="comment">// 分辨率（此处在engine的定义为2048）</span></span><br><span class="line">  <span class="comment">// 采样所用的宽度filterSize:这里先采样5*5范围</span></span><br><span class="line">  <span class="type">float</span> visibility = <span class="number">0.0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 第一件事 先对这个坐标进行采样</span></span><br><span class="line">  poissonDiskSamples(coords.xy);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 第二件事 对每个采样点周围区域进行深度值比较并且累加</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> i =<span class="number">0</span>; i&lt; PCF_NUM_SAMPLES; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// 每个点乘上其覆盖一片区域内的uv范围</span></span><br><span class="line">    <span class="type">vec2</span> uvOffset = poissonDisk[i] * filterSize/RESOLUTION;</span><br><span class="line">    <span class="type">vec4</span> shadowColor = <span class="built_in">texture2D</span>(shadowMap, coords.xy + uvOffset);</span><br><span class="line">    <span class="type">float</span> shadowDepth = unpack(shadowColor);</span><br><span class="line">    <span class="comment">// 计算当前点,同样加上bias</span></span><br><span class="line">    <span class="type">float</span> acc = coords.z &lt; shadowDepth + getDynamicBias(<span class="number">0.0</span>) ? <span class="number">1.0</span>:<span class="number">0.0</span>;</span><br><span class="line">    visibility += acc;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 最后返回平均值</span></span><br><span class="line">  <span class="keyword">return</span> visibility / <span class="type">float</span>(PCF_NUM_SAMPLES);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.PCSS的实现</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> PCSS(<span class="type">sampler2D</span> shadowMap, <span class="type">vec4</span> coords)&#123;</span><br><span class="line">  <span class="comment">// 先进行泊松圆盘采样坐标的记录</span></span><br><span class="line">  poissonDiskSamples(coords.xy);</span><br><span class="line">  <span class="comment">// STEP 1: avgblocker depth</span></span><br><span class="line">  <span class="comment">// 找到Blocker Distance</span></span><br><span class="line">  <span class="type">float</span> dBlocker = findBlocker(shadowMap, coords.xy, coords.z);</span><br><span class="line">  <span class="comment">// STEP 2: penumbra size</span></span><br><span class="line">  <span class="comment">// 利用 STEP1 的BlockerDistance计算 filterSize</span></span><br><span class="line">  <span class="type">float</span> DReceiver = coords.z - dBlocker;</span><br><span class="line">  <span class="type">float</span> WPenumbra = DReceiver * Light_SIZE / dBlocker;</span><br><span class="line">  <span class="comment">// STEP 3: filtering</span></span><br><span class="line">  <span class="comment">// PCF传入 STEP2 计算的filterSize，5.0为魔法数字（可调整效果）</span></span><br><span class="line">  <span class="keyword">return</span> PCF(shadowMap, coords, WPenumbra<span class="number">-5.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>作业细节：</p>
+<p>第一个硬阴影效果遇到了课上提到的阴影粉刺自遮挡问题，显得很奇怪。</p>
+<p>原因是阴影图的每一个纹素texel对于的是一篇区域而非具体的一小个点（分辨率问题）</p>
+<p>所以在计算机看来，（ShadowMap）看到的是与Light垂直的红色小片产生的离散场景</p>
+<p>从Camera出发后连向Light，看到的红色区域就会被橙色区域所挡住</p>
+<p>由此需要引入bias（90度light不存在这种情况）</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_002.png"><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_003.png"></p>
+<p>shadowDepth是从ShadowMap上查询的值，当前深度curDepth是eye到shadingpoint的长度</p>
+<p>所以为了避免自遮挡问题，我们要规定<strong>shadowDepth明显比当前深度小，才能被算作在阴影中</strong></p>
+<p>所以解决办法就是给shadowDepth加一个bias（可动态计算）</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_004.png"></p>
+<p>定义相机视口：根据尝试效果发现，相机设置为200x200或者500x500比较合适</p>
+<p>我不希望有一个方向上定义的特别大导致过度拉伸</p>
+<p>所以定义一下相机视口范围为(200 + 200)x(200 + 200)</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_005.png" alt="5x5"><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_006.png" alt="200x200"></p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_007.png" alt="500x500"><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_008.png" alt="2000x2000"></p>
+<h1 id="附：框架分析"><a href="#附：框架分析" class="headerlink" title="附：框架分析"></a>附：框架分析</h1><blockquote>
+<p>要分析如何创建材质必然从材质的基类Material.js入手，其源码如下：</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Material</span> &#123;</span><br><span class="line">    #flatten_uniforms;</span><br><span class="line">    #flatten_attribs;</span><br><span class="line">    #vsSrc;</span><br><span class="line">    #fsSrc;</span><br><span class="line">    <span class="comment">// Uniforms is a map, attribs is a Array</span></span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params">uniforms, attribs, vsSrc, fsSrc, frameBuffer</span>) &#123;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">uniforms</span> = uniforms;</span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">attribs</span> = attribs;</span><br><span class="line">        <span class="variable language_">this</span>.#vsSrc = vsSrc;</span><br><span class="line">        <span class="variable language_">this</span>.#fsSrc = fsSrc;</span><br><span class="line">        </span><br><span class="line">        <span class="variable language_">this</span>.#flatten_uniforms = [<span class="string">&#x27;uViewMatrix&#x27;</span>,<span class="string">&#x27;uModelMatrix&#x27;</span>, <span class="string">&#x27;uProjectionMatrix&#x27;</span>, <span class="string">&#x27;uCameraPos&#x27;</span>, <span class="string">&#x27;uLightPos&#x27;</span>];</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> k <span class="keyword">in</span> uniforms) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.#flatten_uniforms.<span class="title function_">push</span>(k);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="variable language_">this</span>.#flatten_attribs = attribs;</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">this</span>.<span class="property">frameBuffer</span> = frameBuffer;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">setMeshAttribs</span>(<span class="params">extraAttribs</span>) &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; extraAttribs.<span class="property">length</span>; i++) &#123;</span><br><span class="line">            <span class="variable language_">this</span>.#flatten_attribs.<span class="title function_">push</span>(extraAttribs[i]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">compile</span>(<span class="params">gl</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Shader</span>(gl, <span class="variable language_">this</span>.#vsSrc, <span class="variable language_">this</span>.#fsSrc,</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="attr">uniforms</span>: <span class="variable language_">this</span>.#flatten_uniforms,</span><br><span class="line">                <span class="attr">attribs</span>: <span class="variable language_">this</span>.#flatten_attribs</span><br><span class="line">            &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到其构造函数参数传递了：</p>
+<p>（1）uniforms：string[]</p>
+<p>包含了材质需要的 uniform 变量 –uniform 是在着色器程序运行时保持不变的数据。</p>
+<p>（2）attribs：any</p>
+<p>应一组数据，包含了<strong>需要传递到顶点着色器中的顶点属性</strong>（如顶点位置、法线、颜色等）</p>
+<p>这里需要传递的是额外的信息，基础的已经在API中定义好了</p>
+<p>（3）vsSrc 和 fsSrc：any</p>
+<p>分别表示顶点着色器和片元着色器的源代码</p>
+<p>（4）frameBuffer：可选的帧缓冲区</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_009.png"></p>
+<p>在构造函数中，先把自身设置默认属性</p>
+<p><strong>传入已经预定义好的uniform（MVP矩阵和相机、光源位置）</strong></p>
+<p>之后按顺序把uniform自定义的参数按顺序push传入其中</p>
+<p>之后设置attribs和frameBuffer<img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows-HW/GAMES202_Part1_Real-timeShadows-HW_010.png"></p>
+<p>Phong材质的额外参数传递定义：</p>
+<p>对于uniform，额外传入了纹理颜色信息，Ks，光照强度，shadowMap和光源变换的MVP</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">PhongMaterial</span> <span class="keyword">extends</span> <span class="title class_ inherited__">Material</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="title function_">constructor</span>(<span class="params">color, specular, light, translate, scale, vertexShader, fragmentShader</span>) &#123;</span><br><span class="line">        <span class="keyword">let</span> lightMVP = light.<span class="title class_">CalcLightMVP</span>(translate, scale);</span><br><span class="line">        <span class="keyword">let</span> lightIntensity = light.<span class="property">mat</span>.<span class="title class_">GetIntensity</span>();</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">super</span>(&#123;</span><br><span class="line">            <span class="comment">// Phong</span></span><br><span class="line">            <span class="string">&#x27;uSampler&#x27;</span>: &#123; <span class="attr">type</span>: <span class="string">&#x27;texture&#x27;</span>, <span class="attr">value</span>: color &#125;,</span><br><span class="line">            <span class="string">&#x27;uKs&#x27;</span>: &#123; <span class="attr">type</span>: <span class="string">&#x27;3fv&#x27;</span>, <span class="attr">value</span>: specular &#125;,</span><br><span class="line">            <span class="string">&#x27;uLightRadiance&#x27;</span>: &#123; <span class="attr">type</span>: <span class="string">&#x27;3fv&#x27;</span>, <span class="attr">value</span>: lightIntensity &#125;,</span><br><span class="line">            <span class="comment">// Shadow</span></span><br><span class="line">            <span class="string">&#x27;uShadowMap&#x27;</span>: &#123; <span class="attr">type</span>: <span class="string">&#x27;texture&#x27;</span>, <span class="attr">value</span>: light.<span class="property">fbo</span> &#125;,</span><br><span class="line">            <span class="string">&#x27;uLightMVP&#x27;</span>: &#123; <span class="attr">type</span>: <span class="string">&#x27;matrix4fv&#x27;</span>, <span class="attr">value</span>: lightMVP &#125;,</span><br><span class="line"></span><br><span class="line">        &#125;, [], vertexShader, fragmentShader, <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后就可以观察数据是如何在管线中传递的：</p>
+<p><strong>顶点着色器</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">attribute</span> <span class="type">vec3</span> aVertexPosition;</span><br><span class="line"><span class="keyword">attribute</span> <span class="type">vec3</span> aNormalPosition;</span><br><span class="line"><span class="keyword">attribute</span> <span class="type">vec2</span> aTextureCoord;</span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">mat4</span> uModelMatrix;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">mat4</span> uViewMatrix;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">mat4</span> uProjectionMatrix;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">mat4</span> uLightMVP;</span><br><span class="line"></span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec2</span> vTextureCoord;</span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec3</span> vFragPos;</span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec3</span> vNormal;</span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec4</span> vPositionFromLight;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main(<span class="type">void</span>) &#123;</span><br><span class="line"></span><br><span class="line">  vFragPos = (uModelMatrix * <span class="type">vec4</span>(aVertexPosition, <span class="number">1.0</span>)).xyz;</span><br><span class="line">  vNormal = (uModelMatrix * <span class="type">vec4</span>(aNormalPosition, <span class="number">0.0</span>)).xyz;</span><br><span class="line"></span><br><span class="line">  <span class="built_in">gl_Position</span> = uProjectionMatrix * uViewMatrix * uModelMatrix *</span><br><span class="line">                <span class="type">vec4</span>(aVertexPosition, <span class="number">1.0</span>);</span><br><span class="line"></span><br><span class="line">  vTextureCoord = aTextureCoord;</span><br><span class="line">  vPositionFromLight = uLightMVP * <span class="type">vec4</span>(aVertexPosition, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>顶点着色器前面部分的含义：</p>
+<p>1.自定义接收的attribute，attribute代表的是顶点数据<br>基础的attributes已经在API中定义好了，这里选取<strong>位置，法线，纹理坐标</strong><br>顶点基础attribute包括： <strong>位置、法线、颜色、纹理坐标、切线、副切线</strong>、骨骼权重、骨骼索引 </p>
+<p>2.自定义接收的uniform，这里除了MVP，还有之前的uLightMVP</p>
+<p>3.varying代表将会用到并且传递给片元着色器的变量（out）<br>这里包括 <strong>纹理坐标，片元位置，法线，光源位置</strong></p>
+<p>由于顶点着色器定义只接收了我们光源变换的uniform，和基础attribute，没有其他自定义attribute，所以在构造函数中,super后跟的是[]代表为空</p>
+<p><strong>片元着色器</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#ifdef GL_ES</span></span><br><span class="line"><span class="keyword">precision</span> <span class="keyword">mediump</span> <span class="type">float</span>;</span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Phong related variables</span></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uSampler;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uShadowMap;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uKd;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uKs;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uLightPos;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uCameraPos;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uLightIntensity;</span><br><span class="line"></span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec2</span> vTextureCoord;</span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec3</span> vFragPos;</span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec3</span> vNormal;</span><br><span class="line"><span class="keyword">varying</span> <span class="type">vec4</span> vPositionFromLight;</span><br><span class="line"><span class="comment">//......</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Shadow map related variables</span></span><br><span class="line"><span class="meta">#define NUM_SAMPLES 60</span></span><br><span class="line"><span class="meta">#define BLOCKER_SEARCH_NUM_SAMPLES NUM_SAMPLES</span></span><br><span class="line"><span class="meta">#define PCF_NUM_SAMPLES NUM_SAMPLES</span></span><br><span class="line"><span class="meta">#define NUM_RINGS 10</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#define EPS 1e-3</span></span><br><span class="line"><span class="meta">#define PI 3.141592653589793</span></span><br><span class="line"><span class="meta">#define PI2 6.283185307179586</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#define CAMERA_SIZE 400.0</span></span><br><span class="line"><span class="meta">#define Light_SIZE 50.0</span></span><br><span class="line"><span class="meta">#define RESOLUTION 2048.0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//......</span></span><br><span class="line"><span class="type">vec3</span> blinnPhong() &#123;</span><br><span class="line">  <span class="type">vec3</span> color = <span class="built_in">texture2D</span>(uSampler, vTextureCoord).rgb;</span><br><span class="line">  color = <span class="built_in">pow</span>(color, <span class="type">vec3</span>(<span class="number">2.2</span>));</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> ambient = <span class="number">0.05</span> * color;</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> lightDir = <span class="built_in">normalize</span>(uLightPos);</span><br><span class="line">  <span class="type">vec3</span> normal = <span class="built_in">normalize</span>(vNormal);</span><br><span class="line">  <span class="type">float</span> diff = <span class="built_in">max</span>(<span class="built_in">dot</span>(lightDir, normal), <span class="number">0.0</span>);</span><br><span class="line">  <span class="type">vec3</span> light_atten_coff =</span><br><span class="line">      uLightIntensity / <span class="built_in">pow</span>(<span class="built_in">length</span>(uLightPos - vFragPos), <span class="number">2.0</span>);</span><br><span class="line">  <span class="type">vec3</span> diffuse = diff * light_atten_coff * color;</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> viewDir = <span class="built_in">normalize</span>(uCameraPos - vFragPos);</span><br><span class="line">  <span class="type">vec3</span> halfDir = <span class="built_in">normalize</span>((lightDir + viewDir));</span><br><span class="line">  <span class="type">float</span> spec = <span class="built_in">pow</span>(<span class="built_in">max</span>(<span class="built_in">dot</span>(halfDir, normal), <span class="number">0.0</span>), <span class="number">32.0</span>);</span><br><span class="line">  <span class="type">vec3</span> specular = uKs * light_atten_coff * spec;</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> radiance = (ambient + diffuse + specular);</span><br><span class="line">  <span class="type">vec3</span> phongColor = <span class="built_in">pow</span>(radiance, <span class="type">vec3</span>(<span class="number">1.0</span> / <span class="number">2.2</span>));</span><br><span class="line">  <span class="keyword">return</span> phongColor;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main(<span class="type">void</span>) &#123;</span><br><span class="line"></span><br><span class="line">  <span class="type">float</span> visibility;</span><br><span class="line">  <span class="comment">// NDC 转换</span></span><br><span class="line">  <span class="type">vec3</span> shadowCoord = vPositionFromLight.xyz / vPositionFromLight.w;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将 [-1, 1] 映射到 [0, 1]</span></span><br><span class="line">  shadowCoord = (shadowCoord.xyz + <span class="number">1.0</span>) * <span class="number">0.5</span>; </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  <span class="comment">//visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));</span></span><br><span class="line">  <span class="comment">//visibility = PCF(uShadowMap, vec4(shadowCoord, 1.0));</span></span><br><span class="line">  visibility = PCSS(uShadowMap, <span class="type">vec4</span>(shadowCoord, <span class="number">1.0</span>));</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> phongColor = blinnPhong();</span><br><span class="line"></span><br><span class="line">  <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(phongColor * visibility, <span class="number">1.0</span>);</span><br><span class="line">  <span class="comment">//gl_FragColor = vec4(phongColor, 1.0);</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/EauDouceFish" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2025 EauDouceFish<br></p>
+                <p class="copyright text-muted">Original Theme <a target="_blank" href="http://startbootstrap.com/template-overviews/clean-blog/">Clean Blog</a> from <a href="http://startbootstrap.com/" target="_blank">Start Bootstrap</a></p>
+                <p class="copyright text-muted">Adapted for <a target="_blank" href="https://hexo.io/">Hexo</a> by <a href="http://www.codeblocq.com/" target="_blank">Jonathan Klughertz</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>

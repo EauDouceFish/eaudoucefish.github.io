@@ -237,16 +237,16 @@ Lecture3介绍了实时阴影的计算方法
 <p>注：如果是点光源，就生成6个ShadowMap组成ShadowCube。</p>
 <p>好处是，不需要预先知道场景的几何信息</p>
 <p>坏处是，会有走样、自遮挡等问题</p>
-<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_001.png"></p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows/GAMES202_Part1_Real-timeShadows_001.png"></p>
 <p>还提到了微积分推导，提取出Visibility项的一些问题，但这些都不重要</p>
 <p>最主要的是作业中的PCF、PCSS</p>
 <h2 id="PCF"><a href="#PCF" class="headerlink" title="PCF"></a>PCF</h2><p>PCF是PCSS的前身（也是一部分）</p>
 <p>思想是对ShadingPoint采样ShadowMap周围的部分，取平均值做模糊以此作为软阴影效果的实现。</p>
 <p>这个思想很朴实无华，也很有效。是Unity中URP管线默认的软阴影实现方式</p>
-<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_002.png"></p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows/GAMES202_Part1_Real-timeShadows_002.png"></p>
 <p>这样fliter的尺寸直接决定了阴影的软硬程度。尺寸越大，得到的阴影越软，尺寸越小，得到的阴影越硬。问题是，一图中，大家的阴影软硬程度都是一样的，因为filter的大小是固定的。而这跟实际场景中的阴影还是有些出入的。</p>
 <p>所以我们还有PCSS改进</p>
-<h2 id="PCSS"><a href="#PCSS" class="headerlink" title="PCSS"></a>PCSS</h2><p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_003.png"></p>
+<h2 id="PCSS"><a href="#PCSS" class="headerlink" title="PCSS"></a>PCSS</h2><p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows/GAMES202_Part1_Real-timeShadows_003.png"></p>
 <p>PCSS改进解决的主要问题是，对于一个阴影来说，离物体和投影接触点处越近，我们认为阴影要更硬一些，越远就要越软。所以在此上加入了一个投影的关系权重。</p>
 <p>（如图的钢笔，显然上方笔杆部分投影要软一些）</p>
 <p>所以我们要<strong>动态地</strong>决定filter的大小。</p>
@@ -259,16 +259,15 @@ Lecture3介绍了实时阴影的计算方法
 <p>这一步的动态计算方法：ShadingPoint和Light连线将ShadowMap放在nearClip</p>
 <p>注意Light在模型中为面光源。因为理论上来说，软阴影必然是面光源产生的结果。</p>
 <p>–点光源不会产生软阴影</p>
-<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_004.png">	</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows/GAMES202_Part1_Real-timeShadows_004.png">	</p>
 <p>如图，将范围内各像素的最小深度与x的实际深度比较</p>
 <p>从而判断哪些像素是被归纳入遮挡物	</p>
 <p>最后<strong>把所有遮挡物的深度记下来取平均值</strong>作为最终的 BlockerDistance</p>
 <p>（这一步需要比较，耗时间）</p>
 <p><strong>2.计算filterSize</strong></p>
-<p>利用上一步计算的平均遮挡深度 Blocker Distance，<strong>进一步计算需要模糊的范围</strong>，进而决定 Filter Size。Filter Size就决定了半影（软影）区的大小。</p>
-<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_005.png" alt="Wpenumbra = (Dreceiver - Dblocker)*Wlight/ Dblocker"></p>
-<p>如图所示，利用相似三角形，我们有：</p>
-<p>$$<br>W_{penumbra} &#x3D; \frac{(D_{receiver} - D_{blocker}) \cdot W_{light}}{D_{blocker}}<br>$$</p>
+<p>利用上一步计算的平均遮挡深度 Blocker Distance，<strong>进一步计算需要模糊的范围</strong><br>进而，可以决定 Filter Size —— Filter Size就决定了半影（软影）区的大小</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows/GAMES202_Part1_Real-timeShadows_005.png" alt="Wpenumbra = (Dreceiver - Dblocker)*Wlight/ Dblocker"></p>
+<p>如图所示，利用相似三角形，我们有：<br>$$<br>W_{penumbra} &#x3D; \frac{(D_{receiver} - D_{blocker}) \cdot W_{light}}{D_{blocker}}<br>$$</p>
 <p>这一步最终转化为3中所使用的FilterSize大小</p>
 <p><strong>3.PCF绘制软阴影，利用 平均值 估算阴影强度</strong></p>
 <p>传入上一步计算的 filterSize，利用filterSize在ShadowMap做采样计算</p>
