@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<!-- MathJax for LaTeX support -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="实时阴影：Lecture3 + Lecture4 + 部分Lecture5 的内容
+Lecture3介绍了实时阴影的计算方法
+重拾ShadowMapping原理在GAMES101就讲过ShadowMapping原理：
+是一个2-Pass（两趟）的算法
+1.从光源出发（方向光），生成一个ShadowM"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="EauDouceFish"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="GAMES202-实时阴影"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="实时阴影：Lecture3 + Lecture4 + 部分Lecture5 的内容
+Lecture3介绍了实时阴影的计算方法
+重拾ShadowMapping原理在GAMES101就讲过ShadowMapping原理：
+是一个2-Pass（两趟）的算法
+1.从光源出发（方向光），生成一个ShadowM"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="淡水鱼的山间客栈"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>GAMES202-实时阴影 - 淡水鱼的山间客栈</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">EauDouceFish's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories">
+                            
+                                Categories
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GAMES202-实时阴影</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2025-06-14
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/GAMES202/">#GAMES202</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                        
+
+<a href="/categories/GAMES202/">GAMES202</a>
+
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>实时阴影：Lecture3 + Lecture4 + 部分Lecture5 的内容</p>
+<h1 id="Lecture3"><a href="#Lecture3" class="headerlink" title="Lecture3"></a>Lecture3</h1><p>介绍了实时阴影的计算方法</p>
+<h2 id="重拾ShadowMapping原理"><a href="#重拾ShadowMapping原理" class="headerlink" title="重拾ShadowMapping原理"></a>重拾ShadowMapping原理</h2><p>在GAMES101就讲过ShadowMapping原理：</p>
+<p>是一个2-Pass（两趟）的算法</p>
+<p>1.从光源出发（方向光），生成一个ShadowMap</p>
+<p>2.相机出发，把每个片元换到光源空间。再根据片元自己的深度和光源出发的ShadowMap进行对比。 如果当前片元的深度 &gt; Shadow Map 中记录的深度，就说明照不到（阴影中），否则就被光照亮</p>
+<p>注：如果是点光源，就生成6个ShadowMap组成ShadowCube。</p>
+<p>好处是，不需要预先知道场景的几何信息</p>
+<p>坏处是，会有走样、自遮挡等问题</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_001.png"></p>
+<p>还提到了微积分推导，提取出Visibility项的一些问题，但这些都不重要</p>
+<p>最主要的是作业中的PCF、PCSS</p>
+<h2 id="PCF"><a href="#PCF" class="headerlink" title="PCF"></a>PCF</h2><p>PCF是PCSS的前身（也是一部分）</p>
+<p>思想是对ShadingPoint采样ShadowMap周围的部分，取平均值做模糊以此作为软阴影效果的实现。</p>
+<p>这个思想很朴实无华，也很有效。是Unity中URP管线默认的软阴影实现方式</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_002.png"></p>
+<p>这样fliter的尺寸直接决定了阴影的软硬程度。尺寸越大，得到的阴影越软，尺寸越小，得到的阴影越硬。问题是，一图中，大家的阴影软硬程度都是一样的，因为filter的大小是固定的。而这跟实际场景中的阴影还是有些出入的。</p>
+<p>所以我们还有PCSS改进</p>
+<h2 id="PCSS"><a href="#PCSS" class="headerlink" title="PCSS"></a>PCSS</h2><p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_003.png"></p>
+<p>PCSS改进解决的主要问题是，对于一个阴影来说，离物体和投影接触点处越近，我们认为阴影要更硬一些，越远就要越软。所以在此上加入了一个投影的关系权重。</p>
+<p>（如图的钢笔，显然上方笔杆部分投影要软一些）</p>
+<p>所以我们要<strong>动态地</strong>决定filter的大小。</p>
+<p><strong>实现PCSS三步</strong>：<strong>计算平均遮挡深度，计算filterSize，传入计算结果到PCF估算阴影强度</strong></p>
+<p><strong>PCSS效果比PCF略好一些（好在软影质量更高），但是开销更大。</strong></p>
+<hr>
+<p><strong>1.计算平均遮挡深度 BlockerDistance</strong></p>
+<p>在阴影贴图中寻找Blocker Distance，并计算平均深度。</p>
+<p>之后在点p附近取一个范围(这个范围是自己定义或动态计算的)</p>
+<p>这一步的动态计算方法：ShadingPoint和Light连线将ShadowMap放在nearClip</p>
+<p>注意Light在模型中为面光源。因为理论上来说，软阴影必然是面光源产生的结果。</p>
+<p>–点光源不会产生软阴影</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_004.png">	</p>
+<p>如图，将范围内各像素的最小深度与x的实际深度比较</p>
+<p>从而判断哪些像素是被归纳入遮挡物	</p>
+<p>最后<strong>把所有遮挡物的深度记下来取平均值</strong>作为最终的 BlockerDistance</p>
+<p>（这一步需要比较，耗时间）</p>
+<p><strong>2.计算filterSize</strong></p>
+<p>利用上一步计算的平均遮挡深度 Blocker Distance，<strong>进一步计算需要模糊的范围</strong>，进而决定 Filter Size。Filter Size就决定了半影（软影）区的大小。</p>
+<p><img src="/img/GAMES202/GAMES202_Part1_Real-timeShadows_005.png" alt="Wpenumbra = (Dreceiver - Dblocker)*Wlight/ Dblocker"></p>
+<p>如图所示，利用相似三角形，我们有：</p>
+<p>$$<br>W_{penumbra} &#x3D; \frac{(D_{receiver} - D_{blocker}) \cdot W_{light}}{D_{blocker}}<br>$$</p>
+<p>这一步最终转化为3中所使用的FilterSize大小</p>
+<p><strong>3.PCF绘制软阴影，利用 平均值 估算阴影强度</strong></p>
+<p>传入上一步计算的 filterSize，利用filterSize在ShadowMap做采样计算</p>
+<hr>
+<p><strong>代码结构如下</strong></p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> PCSS(<span class="type">sampler2D</span> shadowMap, <span class="type">vec4</span> coords)&#123;</span><br><span class="line">  <span class="comment">// 先进行泊松圆盘采样坐标的记录</span></span><br><span class="line">  poissonDiskSamples(coords.xy);</span><br><span class="line">  <span class="comment">// STEP 1: avgblocker depth</span></span><br><span class="line">  <span class="comment">// 找到Blocker Distance</span></span><br><span class="line">  <span class="type">float</span> dBlocker = findBlocker(shadowMap, coords.xy, coords.z);</span><br><span class="line">  <span class="comment">// STEP 2: penumbra size</span></span><br><span class="line">  <span class="comment">// 利用 STEP1 的BlockerDistance计算 filterSize</span></span><br><span class="line">  <span class="type">float</span> DReceiver = coords.z - dBlocker;</span><br><span class="line">  <span class="type">float</span> WPenumbra = DReceiver * Light_SIZE / dBlocker;</span><br><span class="line">  <span class="comment">// STEP 3: filtering</span></span><br><span class="line">  <span class="comment">// PCF传入 STEP2 计算的filterSize，5.0为魔法数字（可调整效果）</span></span><br><span class="line">  <span class="keyword">return</span> PCF(shadowMap, coords, WPenumbra<span class="number">-5.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="Lecture4"><a href="#Lecture4" class="headerlink" title="Lecture4"></a>Lecture4</h1><p>后续提到了PCF&#x2F;PCSS的数学原理，VSSM、SAT等改进方法。但是实战意义有待考究，只学习理论总会忘记，故在这里只做简单总结</p>
+<h2 id="PCSS为什么慢？"><a href="#PCSS为什么慢？" class="headerlink" title="PCSS为什么慢？"></a>PCSS为什么慢？</h2><p>回顾PCSS的过程一共有三步。</p>
+<p>Step1: <strong>计算平均遮挡深度 BlockerDistance</strong></p>
+<p>Step2: <strong>计算filterSize估算半影</strong></p>
+<p>Step3: <strong>将filterSize放入PCF</strong></p>
+<p>症结在于：</p>
+<p>1.Step1对范围进行blocker判断</p>
+<p>2.Step3也需要对范围做ShadowMap采样</p>
+<p>导致PCSS开销大。<br>所以解决方案有两种：<br>1.把”在Step1中对范围进行blocker判断”，”Step3中对flitering中的ShadowMap采样”</p>
+<p>这两个操作都变为稀疏的。但是采样稀疏会有噪声，所以最后在图像空间降噪<br>2.使用VSSM</p>
+<h2 id="VSSM、MSM"><a href="#VSSM、MSM" class="headerlink" title="VSSM、MSM"></a>VSSM、MSM</h2><p>这些方法都是对阴影的改进，作业内不涉及。故原理在此忽略</p>
+<h1 id="Lecture5部分"><a href="#Lecture5部分" class="headerlink" title="Lecture5部分"></a>Lecture5部分</h1><p>同样是一些其他的改进方法：</p>
+<h2 id="SDF"><a href="#SDF" class="headerlink" title="SDF"></a>SDF</h2><h2 id="Distance-Field-Soft-Shadow"><a href="#Distance-Field-Soft-Shadow" class="headerlink" title="Distance Field Soft Shadow"></a>Distance Field Soft Shadow</h2><hr>
+<hr>
+<hr>
+<hr>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/EauDouceFish" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2025 EauDouceFish<br></p>
+                <p class="copyright text-muted">Original Theme <a target="_blank" href="http://startbootstrap.com/template-overviews/clean-blog/">Clean Blog</a> from <a href="http://startbootstrap.com/" target="_blank">Start Bootstrap</a></p>
+                <p class="copyright text-muted">Adapted for <a target="_blank" href="https://hexo.io/">Hexo</a> by <a href="http://www.codeblocq.com/" target="_blank">Jonathan Klughertz</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
