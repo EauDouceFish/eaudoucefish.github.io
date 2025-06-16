@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<!-- MathJax for LaTeX support -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="实时环境光照：Lecture5+Lecture6+部分Lecture7 的内容
+讲述了如何实现实时的环境光照
+Lecture51.环境光照回顾
+使用Spherical Map &amp;#x2F; CubeMap（常用）
+Spherical Map属于早期技术 有一些缺点 例如极点失真等等
+2.IBL Im"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="EauDouceFish"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="GAMES202-实时环境光照"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="实时环境光照：Lecture5+Lecture6+部分Lecture7 的内容
+讲述了如何实现实时的环境光照
+Lecture51.环境光照回顾
+使用Spherical Map &amp;#x2F; CubeMap（常用）
+Spherical Map属于早期技术 有一些缺点 例如极点失真等等
+2.IBL Im"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="淡水鱼的山间客栈"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>GAMES202-实时环境光照 - 淡水鱼的山间客栈</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">EauDouceFish's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories">
+                            
+                                Categories
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GAMES202-实时环境光照</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2025-06-16
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/GAMES202/">#GAMES202</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                        
+
+<a href="/categories/GAMES202/">GAMES202</a>
+
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>实时环境光照：Lecture5+Lecture6+部分Lecture7 的内容</p>
+<p>讲述了如何实现实时的环境光照</p>
+<h1 id="Lecture5"><a href="#Lecture5" class="headerlink" title="Lecture5"></a>Lecture5</h1><p>1.环境光照回顾</p>
+<p>使用Spherical Map &#x2F; CubeMap（常用）</p>
+<p>Spherical Map属于早期技术 有一些缺点 例如极点失真等等</p>
+<p>2.IBL Image Based Lighting</p>
+<p>使用渲染方程shade a point – 拆出view</p>
+<p><strong>最终目标就算对于一个渲染方程的三个部分：Light项+BRDF+View分别考虑</strong></p>
+<h2 id="分离积分，Split-Sum"><a href="#分离积分，Split-Sum" class="headerlink" title="分离积分，Split Sum"></a>分离积分，Split Sum</h2><p>1.Light项：</p>
+<p>通用解法：蒙特卡洛积分进行数值近似（大量样本采样）– 极其慢</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_001.png"></p>
+<p>（fragment本不能出现sample 但是由于可复用等，或许现在可以进行应用）</p>
+<p>改进后解法：Split Sum 拆项 此时对G函数值的范围积分作为积分线</p>
+<p>Glossy代表Support小（左）</p>
+<p>Diffuse代表Support大但是Smooth（右） 值变化不大</p>
+<p>所以二者都可以将乘积的积分拆为积分的乘积(符合拆积分的条件：Support小或者积分Smooth)<img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_002.png"></p>
+<p>这样原渲染方程就变为：</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_003.png"><br><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_004.png" alt="Split Sum公式"></p>
+<p>$ L_o(p, \omega_o) \approx<br>\frac{\int_{\Omega_{fr}} L_i(p, \omega_i) , d\omega_i}{\int_{\Omega_{fr}} d\omega_i}<br>\cdot<br>\int_{\Omega^+} f_r(p, \omega_i, \omega_o) \cos \theta_i , d\omega_i $ </p>
+<p>左边是Light项除以一个空积分，乘BRDF项的积分（不考虑View项）</p>
+<p>那就只需要计算Light和BRDF项的近似（2个stage即可）</p>
+<p><strong>1st Stage：对于Light</strong></p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_005.png">表示的意思是对Light在BRDF区域内进行积分，也就是对于区域内进行模糊</p>
+<p>所以无需采样后再模糊，直接对pre-filter的区域filter查询: 只需要查询一个方向</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_006.png"></p>
+<p>这样也就相当于直接查询pre-filter的贴图即可</p>
+<p>对于贴图可以类似使用mipmap，BRDF立体角查询的范围越大就越模糊 </p>
+<p>对于这些预先制作的贴图，如果需要查询不存在的尺寸，就要进行插值</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_007.png"></p>
+<p>我对于这个的简单理解是：从IBL查询Light项，需要该项直接在目标方向查询模糊后结果即可</p>
+<p>2nd Stage：对于BRDF项$ \int_{\Omega+}f_r(p, \omega_i, \omega_o)\cos\theta_i,d\omega_i $</p>
+<p>这一项代表的含义，由于BRDF包含参数过多（5维+）无法进行打表预计算</p>
+<p>Tips：BRDF包含位置$ x $，入射方向$ \theta_i $$ \phi_i $，出射方向$ \theta_o $$ \phi_o $</p>
+<p><strong>最终其会被看做一个5维+的函数</strong>$ f_r(x, \theta_i, \phi_i, \theta_o, \phi_o) $<strong>（还不包含粗糙度，color等）</strong></p>
+<hr>
+<blockquote>
+<p><strong>所以对于这个BRDF项，需要进行进一步简化 将其作为微表面模型有</strong></p>
+<p><strong>(h代表半程向量)</strong></p>
+</blockquote>
+<p>$ f(i, o) &#x3D; \frac{菲涅尔项F(i, h) * 阴影遮罩项(环境光不考虑)G(i, o, h) * 微表面法线分布函数D(h)}<br>{归一化因子4 * (n<em>i)</em>(n*o)} $</p>
+<hr>
+<p><strong>（1）对于F(i, h)，其是用来计算反射率的，一般使用Schlick近似</strong></p>
+<p>近似公式: $ R(\theta) ≈ R_0 + (1-R_0)(1-cos\theta)^5 $</p>
+<p>其中$ R_0 $是基础反射率，有$ R_0 &#x3D; \Big(\frac{n_1 - n_2}{n_1 + n_2}\Big)^2 $,$ n_1, n_2 $分别是入射、出射两个介质的折射率,$ \theta $为入射角度</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_008.png"></p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_009.png"></p>
+<p><strong>（2）对于G(h)，有几个可选用的模型</strong></p>
+<p>1.Phong模型，十分古老</p>
+<p>2.GGX模型，常用于实时渲染</p>
+<p>3.Beckmann模型，常用于离线渲染</p>
+<p>提要：在实时渲染中，入射角出射角以及半角因为相近所以可以相互替换</p>
+<p>(这里不理解，我也不知道为什么半角可以近似相等)</p>
+<p>GGX实现公式：需要粗糙度和NdotH，H为半程向量</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_010.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// [Blinn 1977, &quot;Models of light reflection for computer synthesized pictures&quot;]</span><br><span class="line">float D_Blinn( float a2, float NoH )</span><br><span class="line">&#123;</span><br><span class="line">    float n = 2 / a2 - 2;</span><br><span class="line">    return (n+2) / (2*PI) * PhongShadingPow( NoH, n );  // 1 mad, 1 exp, 1 mul, 1 log</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Beckmann公式和代码实现</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_011.png">等同于下面的公式，m为微表面法线的分布</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_012.png"></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// [Beckmann 1963, &quot;The scattering of electromagnetic waves from rough surfaces&quot;]</span><br><span class="line">float D_Beckmann( float a2, float NoH )</span><br><span class="line">&#123;</span><br><span class="line">    float NoH2 = NoH * NoH;</span><br><span class="line">    return exp( (NoH2 - 1) / (a2 * NoH2) ) / ( PI * a2 * NoH2 * NoH2 );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// GGX / Trowbridge-Reitz</span><br><span class="line">// [Walter et al. 2007, &quot;Microfacet models for refraction through rough surfaces&quot;]</span><br><span class="line">float D_GGX( float a2, float NoH )</span><br><span class="line">&#123;</span><br><span class="line">    float d = ( NoH * a2 - NoH ) * NoH + 1; // 2 mad</span><br><span class="line">    return a2 / ( PI*d*d );         // 4 mul, 1 rcp</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>可以看到无论是哪一种的$ D(H) $实现，都需要微表面粗糙程度系数$ \alpha $，入射角度$ \theta $</p>
+<p>对于菲涅尔项（$ F $），需要基础反射率$ R_0 $</p>
+<p>需要3维度数据，但是在代码实现中只需要两个维度的数据，并不需要基础反射率$ R_0 $</p>
+<p>因为对于3个数据查表依然麻烦。需要将其压缩为2个</p>
+<p>课上提出了神奇的办法，但是推导很省略。</p>
+<p>此处为详细办法的推导：</p>
+<p>对于BRDF项，将其除以菲涅尔项$ F $再乘以$ F $</p>
+<p>原式$ \int_{\Omega+}f_r(o, \omega_i, \omega_o)cos\theta_i d\omega_i $</p>
+<p>&#x3D; $ \int_{\Omega+}\frac{f_r(p,\omega_i,\omega_o)}{F}Fcos\theta_id{\omega_i} $</p>
+<p>再用Schlick近似替换提取出来的$ F $</p>
+<p>&#x3D; $ \int_{\Omega+}\frac{fr(p,\omega_i, \omega_o)}{F}cos\theta(R_0 + (1-R_0)(1-cos\theta)^5)d{\omega} $</p>
+<p>这里提取$ R_0 $</p>
+<p>&#x3D;$ \int_{\Omega+}\frac{fr(p, \omega_i, \omega_o)}{F}*(R_0(1 - (1-cos\theta)^5) + (1-cos\theta)^5)cos\theta d\omega $</p>
+<p>a+b的积分等于a积分+b积分</p>
+<p>&#x3D;$ \int_{\Omega+}\frac{fr(p, \omega_i, \omega_o)}{F}*R_0((1 - (1-cos\theta)^5))cos\theta d\omega + \int_{\Omega+}\frac{fr(p, \omega_i, \omega_o)}{F}(1-cos\theta)cos\theta d\omega  $</p>
+<p>左半边$ R_0 $可以提取出来</p>
+<p>&#x3D; $ R_0\int_{\Omega+}\frac{fr(p, \omega_i, \omega_o)}{F}*(1 - (1-cos\theta)^5)cos\theta d\omega + \int_{\Omega+}\frac{fr(p, \omega_i, \omega_o)}{F}(1-cos\theta)cos\theta d\omega $</p>
+<p>就变为课程所说的形式</p>
+<p>回到曾经的公式$ f(i, o) &#x3D; $</p>
+<p>$ \frac{菲涅尔项F(i, h) * 阴影遮罩项(环境光不考虑)G(i, o, h) * 微表面法线分布函数D(h)}<br>{归一化因子4\cdot (n\cdot i)(n\cdot o)} $</p>
+<p>在不考虑阴影遮罩项的情况下，上下菲涅尔项$ F $可约掉</p>
+<p>$ \frac{f_r(p,\omega_i,\omega_o)}{F} \approx \frac{D(h)}{4(n,i)(n, o)} $</p>
+<p>这个$ D(h) $可以任意选用我们的微表面分布模型，无论哪一种，都只需要粗糙度$ \alpha $和角度$ \theta $用于计算NdotH</p>
+<p>最终带入回到原式子我们法线，整个BRDF项就从$ \int_{\Omega+}f_r(o, \omega_i, \omega_o)cos\theta_i d\omega_i $变为了</p>
+<p>$ R_0\int_{\Omega+}\frac{D(h)}{4(n,i)(n, o)}(1 - (1-cos\theta)^5)cos\theta d\omega + \int_{\Omega+}\frac{D(h)}{4(n,i)(n, o)}(1-cos\theta)cos\theta d\omega $</p>
+<p>其中就只需要一个粗糙度和一个角度就可以进行完整的表示</p>
+<p>对于二维的预计算就很方便，可以直接进行打表</p>
+<p>反应在直观理解上就是，对于不同的角度，给出预计算好的不同的粗糙度</p>
+<p>将这两个值直接放入公式就可以得到最终需要的BRDF项</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_013.png"></p>
+<p>综上所述，SplitSum方法就是将渲染方程拆开，变成pre-filter预计算的Light+纹理查询计算的BRDF即可</p>
+<p><strong>以上部分为Lecture5的内容</strong></p>
+<h1 id="Lecture6"><a href="#Lecture6" class="headerlink" title="Lecture6"></a>Lecture6</h1><p>在上一节课中实现的环境光照没有考虑任何的阴影，在Lecture6中解释补充阴影的实现，球谐函数相关的知识</p>
+<p>以及解释补充了PRT（Precomputed Radiance Transfer）</p>
+<p>提要：环境光照是一个manylight的问题，生成阴影是非常难的。</p>
+<p>如果都生成shadowmap,开销巨大</p>
+<p>最难的一个部分就是visibility项$ V $</p>
+<p>AO-环境光遮蔽近似阴影？不准，需要constant的环境光（全白，全灰）</p>
+<p>目前工业界使用的方法：只使用主光来生成阴影（太阳）</p>
+<p>先做课前知识储备：</p>
+<p>（1）复习傅里叶变换：<strong>左边是时域，右边是频域</strong><br><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_014.png"></p>
+<p>之前对这个图的理解似懂非懂，现在有了进一步认识：</p>
+<p>图像<strong>中心代表低频</strong>（例如背景，颜色差不多），<strong>离中心越远代表越高频</strong>（例如头发，颜色明暗变化大）</p>
+<p><strong>绝大多数东西都是低频的，所以中心部分比较亮</strong>（十字是因为边缘导致的超高频）</p>
+<p>而进行低通滤波的操作，就是只保留中心部分，在离中心远的地方就不保留，最终只剩下低频信号</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_015.png"></p>
+<p>（2）类似傅里叶变换从频域上做滤波的逻辑</p>
+<p>时域上做卷积等于在频域上相乘，在频域上高频*低频&#x3D;低频</p>
+<p>当两个函数相乘再积分，得到的结果的频率是由低者决定的</p>
+<p>低频&#x3D;smooth</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_016.png"></p>
+<p>（3）基函数：一个函数可以被若干个另一函数的组合所描述</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_017.png"></p>
+<p>（4）球谐函数SH（Spherical Harmonics）</p>
+<p>SH就是<strong>一系列的2D基函数，定义在球面上（用来描述方向）</strong></p>
+<p><strong>课上给的球谐函数可视化非常抽象，但只要知道用n阶球谐函数可以表示不同的球面上信息即可</strong></p>
+<p><strong>蓝色代表正值，黄色代表负值</strong></p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_018.png"></p>
+<p>提出疑惑：为什么不用2D的傅里叶变换来模拟，而是用SH？<br>课中解答是：模拟后变换回球面，会有可能有缝隙。SH是非常连续的，很适合直接用来描述球面上的内容</p>
+<p>另外，SH可以很方便的表示低频到高频</p>
+<p>SH是一系列的基函数，每个SH的基函数都是用勒让德多项式描述的。</p>
+<p><strong>要得到这些球谐函数基函数的系数，就需要投影：（类比3D空间向量投影到xyz轴）</strong><br><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_019.png"></p>
+<p>注意到，此处是product integral似乎不是点乘，但依然是投影。（但其实仍然是点乘）</p>
+<p><strong>投影的本质–做product integral！这一点理解对于工程实现非常重要</strong></p>
+<p>回顾渲染方程中，Lighting是由环境map来的球面函数，BRDF是定义在半球上的光滑函数</p>
+<p>二者逐点相乘并且积分，就是product integral，其中diffuse BRDF还能类似低通滤波（smooth）</p>
+<p>所以只需要3阶的SH就可以很好的恢复了</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_020.png"></p>
+<p>回到之前：两个函数做product integral，二者频率由低频者决定</p>
+<p>所以diffuse球的频率由BRDF决定，BRDF只需要3阶就可以描述</p>
+<p>那对于Light的描述自然也不需要那么精确。经过先贤实验，对于任何diffuse物体，</p>
+<p>都可以用前3阶的SH来进行描述，误差小于3%可以忽略</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_021.png"></p>
+<p>（SH通常很适合描述diffuse，对于高频并不是特别好用，但也可以用）</p>
+<p>同时由于SH有正交性质，它可以很简单的投影重建</p>
+<p>$ \int_{\Omega+}B_i(i)\cdot B_j(i) &#x3D; 1 \space (i &#x3D; j) $</p>
+<p>$ \int_{\Omega+}B_i(i)\cdot B_j(i) &#x3D; 0 \space (i \neq j) $</p>
+<p>讲述了如此多的前述知识后，引出解决阴影问题的方案：PRT</p>
+<p>理论上方法需要进行$ 6 * 分辨率^2 $次的3个贴图相乘计算，非常麻烦</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_022.png"></p>
+<p>PRT基本思想：</p>
+<p>场景中只有光照变化，其他东西都是不变的</p>
+<p>将渲染方程变为Lighting和Light Transport两项</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_023.png"></p>
+<p>对于Light项将其投影到基函数上，<strong>预计算LightTransport</strong>后也将其投影到基函数上</p>
+<p>我们要做的就是要预计算LightTransport</p>
+<p>所以对于diffuse提取出Kd项（$ \rho $）：</p>
+<p>$ L(o) &#x3D; \rho \int_\Omega L(i)V(i)max(0,n \cdot i)di<br> $</p>
+<p>将$ L(i) $用SH重建（变成基函数）$ L(i) \approx \sum l_i B_i(i) $</p>
+<p><strong>其中</strong>$ B_i(i) $<strong>为（SH的）基函数，</strong>$ l_i $<strong>为lighting投影后的系数lighting coefficient</strong></p>
+<p>也就是将$ l_{i} $组成的向量投影到这个SH向量空间中。</p>
+<p>于是有：</p>
+<p>$ L(o) \approx \rho\int_\Omega  \sum l_i B_i(i)V(i)max(0,n \cdot i)di $</p>
+<p>将其提取出来（大部分情况下无需考虑求和与积分的顺序）</p>
+<p>$ \approx \rho \sum l_i \int_\Omega B_i(i)V(i)max(0,n \cdot i)di $</p>
+<p>对于前面的求和项都认为是常数了，对于积分项：<br>$ \int_\Omega B_i(i)V(i)max(0,n \cdot i)di $，我们发现其是基函数和LightTransport项的乘积的积分</p>
+<p>所以当LightTransport不变时候（看作常数），我们可以将其也看作一个对基函数的投影</p>
+<p>（LightTransport项结果就作为基函数的系数！！）</p>
+<p>所以对于这个积分项也是可以进行预计算的！</p>
+<p>最后有<br>$ L(o) \approx \rho \sum l_i T_i $</p>
+<p>其中$ T_i $就是把LightTransport作为基函数系数，预计算后的结果</p>
+<p>就是这样算下来有特性：</p>
+<p>1.LightTransport是不可变的（场景不可动）（坏处）</p>
+<p>2.Lighting项是预计算的，如果给多个场景，只需要不同预计算，到时候直接换光源即可（好处）</p>
+<p><strong>有一个特性：预计算的光源在投影在SH时候，如果旋转了，SH系数可以快速得到（好处）</strong></p>
+<p>旋转SH的基函数之后，新函数也可以被同阶的基函数得到–可以打表</p>
+<p>这样子光照就可以旋转</p>
+<p>所以最终就是把一个ShadingPoint直接变成了一个点乘</p>
+<p>$ L(o) \approx \rho \sum l_i T_i $</p>
+<p><strong>以上为Lecture6的内容</strong></p>
+<p><strong>留了一个悬念：Diffuse的物体表示完成了，Glossy如何表示？Glossy旋转视角、旋转物体？</strong></p>
+<p><strong>考虑环境光照，实时光照、多次Bounce？</strong></p>
+<h1 id="Lecture7"><a href="#Lecture7" class="headerlink" title="Lecture7"></a>Lecture7</h1><p>记录Lecture7的实时环境光照部分</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_024.png"></p>
+<p>补充说明：ShadingPoint指的是三角形的顶点，可以per-pixel进行三角形插值结果的着色</p>
+<p>回顾PRT在Diffuse的使用方法：将Light和LightTransport项投影到SH上进行预计算</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_025.png"></p>
+<p>似乎公式不一样，但是由于SH正交性，$ B_p &#x3D; B_q $的时候投影到的两个基函数是一样的才有值</p>
+<p>所以本质上是一样的理解</p>
+<p>但是对于<strong>Glossy</strong>的物体，需要考虑反射方向，BRDF变为了4D的（2维输入，2维输出）</p>
+<p>不能用同样的方法把LightTransport投影到SH（其包含V和BRDF，给一个o就会有不一样的BRDF，也就是对每个观察方向来说，都会在SH的向量空间投影出一组完全不同的向量。这样显然不行）</p>
+<p>而在Diffuse中，ShadingPoint结果和视角无关</p>
+<p>在Glossy中，原式$ L(o) \approx \rho \sum l_i T_i $就和o有关</p>
+<p>就变为了$ L(o) \approx \rho \sum l_i T_i(o) $</p>
+<p>但是对于o的函数，又可以把$ T_i(o) $投影到关于在o的方向上的SH上（这里理解困难）</p>
+<p>简单来说就是对每个方向，不可避免的进行单独的SH投影计算</p>
+<p>如果单个的投影是一个向量，那对于每一个方向的投影就是一个矩阵</p>
+<p>$ T_i(o) \approx \sum t_{ij} B_j(o) $</p>
+<p>其中$ t_{ij} $是transport Matrix，$ B_j(o) $是新的基函数</p>
+<blockquote>
+<p><strong>将之前记录的系数</strong>$ l_i $<strong>与矩阵相乘成为整个新的投影系数</strong></p>
+</blockquote>
+<p>$ L(o) \approx \rho \sum(\sum l_i t_{ij})B_j(o) $</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_026.png"></p>
+<p>代价：每个顶点都要存一个矩阵，例如使用5阶SH，那就要用25<em>25 &#x3D; 625的矩阵存储，Glossy要进行向量</em>矩阵</p>
+<p>此处又补充谈到，如何在PRT中实现光线多次弹射?<br><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_027.png"></p>
+<p>可以看到加入interreflection之后，佛像脚底下变亮了，明显好看、真实了</p>
+<p>在讨论这个问题前要做知识储备：</p>
+<p>用表达式对不同光线路径进行分类：</p>
+<p>L代表Light，E代表Eye，D&#x2F;G代表Diffuse&#x2F;Glossy（S代表Specular完全镜面）</p>
+<p>代表光线弹射到三种类型若干次数之后进入眼中</p>
+<p>$ L(D|G)*E $</p>
+<p>$ LS*(D|G)*E $</p>
+<p>……</p>
+<p>如何计算任意复杂的LightTransport？</p>
+<p>回顾上一节课，闫老师在此处给了两个关于LightTransport项的理解：<br><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_028.png"></p>
+<p>对于这个公式：</p>
+<p>$ T_i &#x3D; \int_{\Omega}B_i(i)V(i)max(0, n \cdot i) di $</p>
+<p>1.可以将其看作对LightTransport和基函数$ B_i(i) $做product integral</p>
+<p><strong>2.将其看作渲染方程，其中基函数代替Light项来进行对目标的渲染</strong></p>
+<p><strong>每个basis得到一个渲染图,最后我们进行重建从而得出最后的shaing值。</strong></p>
+<hr>
+<p><strong>又一提到缺点：</strong></p>
+<p><strong>SH不太适合做高频（26阶才能恢复不咋样的高频信息）</strong></p>
+<p><strong>当改变场景或者材质时需要重新预计算light transport，此外预计算的数据比较大</strong></p>
+<hr>
+<p><strong>预计算下一步的工作</strong></p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_029.png"></p>
+<p>此后介绍了一种”小波”-wavelet来代替SH作为basis function的方法，似乎看起来不错</p>
+<p>但方法各有利弊，在此一提：</p>
+<p>2D Wavelet有和SH不一样的性质，其是定义在图像块而非球面上的，并且定义域不同：<br><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_030.png"></p>
+<p>SH可以紧凑表述的原因：给出几个阶段即可</p>
+<p>Wavelet进行压缩：任何函数投影到所有Wavelet的基函数，但很多基函数系数接近0<br>所以给一个临界值，将过于接近0的系数丢弃掉<br>不断先将高频信息留在3&#x2F;4的图像上（想起来mipmap），低频集中在左上<br>然后对左上的继续进行小波变换（很像四叉树）</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_031.png"></p>
+<p>小波可以渲染出高频信息，很好看，对比SH很明显</p>
+<p><img src="/img/GAMES202/GAMES202_Part2_Real-timeEnvironmentMapping/GAMES202_Part2_Real-timeEnvironmentMapping_032.png"></p>
+<p>但是显然有代价：小波不支持快速旋转（SH有快速旋转使用同阶基函数描述的性质）</p>
+<p>小波在课程中没有更多的介绍，也没有在作业中出现，此处不再提及</p>
+<p>最后，老师分享了自己七点吃早饭后睡觉到十一点半的作息</p>
+<p>联想到自己只有打GameJam时候偶尔会熬夜到早上6点睡到10点<br>感叹高手的精力总是如此充沛</p>
+<p><strong>以上为Lecture7中的实时环境光照部分的内容</strong></p>
+<p>部分参考毛老师白皮书<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/69380665">https://zhuanlan.zhihu.com/p/69380665</a></p>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/EauDouceFish" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2025 EauDouceFish<br></p>
+                <p class="copyright text-muted">Original Theme <a target="_blank" href="http://startbootstrap.com/template-overviews/clean-blog/">Clean Blog</a> from <a href="http://startbootstrap.com/" target="_blank">Start Bootstrap</a></p>
+                <p class="copyright text-muted">Adapted for <a target="_blank" href="https://hexo.io/">Hexo</a> by <a href="http://www.codeblocq.com/" target="_blank">Jonathan Klughertz</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
