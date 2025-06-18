@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<!-- MathJax for LaTeX support -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="实时全局光照的作业：homework3本次作业课上便透露，需要完成 SSR 屏幕空间的反射制作全局光照
+耗时：4天
+根据作业指引做三个阶段：
+1.计算shadowmap所需深度值，保存到贴图
+2.计算屏幕空间每个像素的：
+世界位置worldPos，世界法线worldNormal，漫反射反射率，可见性"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="EauDouceFish"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="GAMES202-实时全局光照-作业3"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="实时全局光照的作业：homework3本次作业课上便透露，需要完成 SSR 屏幕空间的反射制作全局光照
+耗时：4天
+根据作业指引做三个阶段：
+1.计算shadowmap所需深度值，保存到贴图
+2.计算屏幕空间每个像素的：
+世界位置worldPos，世界法线worldNormal，漫反射反射率，可见性"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="淡水鱼的山间客栈"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>GAMES202-实时全局光照-作业3 - 淡水鱼的山间客栈</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">EauDouceFish's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories">
+                            
+                                Categories
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GAMES202-实时全局光照-作业3</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2025-06-18
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/GAMES202/">#GAMES202</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                        
+
+<a href="/categories/GAMES202/">GAMES202</a>
+
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <h1 id="实时全局光照的作业：homework3"><a href="#实时全局光照的作业：homework3" class="headerlink" title="实时全局光照的作业：homework3"></a>实时全局光照的作业：homework3</h1><p>本次作业课上便透露，需要完成 SSR 屏幕空间的反射制作全局光照</p>
+<p>耗时：4天</p>
+<p>根据作业指引做三个阶段：</p>
+<p>1.计算shadowmap所需深度值，保存到贴图</p>
+<p>2.计算<strong>屏幕空间</strong>每个像素的：</p>
+<p>世界位置worldPos，世界法线worldNormal，漫反射反射率，可见性信息</p>
+<p>之后保存到对应贴图中</p>
+<p>3.基于几何信息（位置、法线），遮挡信息（光源坐标系Depth），场景材质信息（漫反射反射率）计算<strong>两次反射</strong>的全局光照结果</p>
+<p>要完成三个任务：</p>
+<p>1.直接光照着色</p>
+<p>2.实现SSR：屏幕空间求交</p>
+<p>3.间接光照着色</p>
+<h2 id="1-直接光照着色"><a href="#1-直接光照着色" class="headerlink" title="1.直接光照着色"></a>1.直接光照着色</h2><p>本部分和ssrFragment文件有关，首先要<a target="_blank" rel="noopener" href="https://www.yuque.com/eaudouce/oax1gw/oclhs7199pnbwd10?inner=ucf3ca6bc">分析一下ssrFragment.glsl文件</a></p>
+<p><strong>目标是完成ssrFragment.glsl中待完成的EvalDiffuse、EvalDirectionalLight函数，</strong></p>
+<p>并且在main函数完成直接光照。</p>
+<p>本次作业框架可以直接打开，看到的是没有计算光照的结果：</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_001.png"></p>
+<p>另，作业PDF中提到，GetGBufferDiffuse获得的是线性空间值。</p>
+<p>这里涉及到<a target="_blank" rel="noopener" href="https://www.yuque.com/eaudouce/oax1gw/gfozecgozi7so73g?inner=ua5166a74">Gamma校正</a>相关的问题，在此不展开</p>
+<h4 id="EvalDiffuse"><a href="#EvalDiffuse" class="headerlink" title="EvalDiffuse"></a>EvalDiffuse</h4><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> EvalDiffuse(<span class="type">vec3</span> wi, <span class="type">vec3</span> wo, <span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>); </span><br><span class="line">  <span class="keyword">return</span> L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先思考如何获得Diffuse值以完成EvalDiffuse：</p>
+<p>我们已经有四张图：</p>
+<p><strong>世界位置worldPos，世界法线worldNormal，漫反射反射率，可见性信息</strong></p>
+<p>经过分析，EvalDiffuse 理应只要使用uv采样：</p>
+<p>1.漫反射反射率贴图</p>
+<p>2.反射贴图</p>
+<p>3.再根据PBR公式或者其他公式计算Diffuse即可</p>
+<p>–漫反射物体各个观察角度没有区别，不需要用到wo</p>
+<p>回忆公式，在PBR中使用微表面Cook-Torrance模型，伪代码如下：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//================== Direct Light  ============================================== //</span></span><br><span class="line"><span class="comment">//Specular</span></span><br><span class="line"><span class="comment">//Cook-Torrance BRDF</span></span><br><span class="line"><span class="type">float</span> HdotV = saturate(<span class="built_in">dot</span>(H,V));</span><br><span class="line"><span class="type">float</span> NdotV = saturate(<span class="built_in">dot</span>(N,V));</span><br><span class="line"><span class="type">float</span> NdotL = saturate(<span class="built_in">dot</span>(N,L));</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> D = D_DistributionGGX(N,H,Roughness);</span><br><span class="line">float3 F = F_FrenelSchlick(HdotV,F0);</span><br><span class="line"><span class="type">float</span> G = G_GeometrySmith(N,V,L,Roughness);</span><br><span class="line"></span><br><span class="line">float3 KS = F;</span><br><span class="line">float3 KD = <span class="number">1</span>-KS;</span><br><span class="line">KD*=<span class="number">1</span>-Metallic;</span><br><span class="line">float3 nominator = D*F*G;</span><br><span class="line"><span class="type">float</span> denominator = <span class="built_in">max</span>(<span class="number">4</span>*NdotV*NdotL,<span class="number">0.001</span>);</span><br><span class="line">float3 Specular = nominator/denominator * NdotL;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Diffuse</span></span><br><span class="line">float3 Diffuse = KD * BaseColor / PI * NdotL;</span><br><span class="line">float3 DirectLight = (Diffuse + Specular) * Radiance;</span><br><span class="line">FinalColor.rgb = DirectLight.rgb;</span><br></pre></td></tr></table></figure>
+
+<p>那么对于作业规定的物体只是Diffuse，KS &#x3D; 0，KD &#x3D; 1，Diffuse项的计算就退化为Lambert光照模型</p>
+<p>（引入$ \frac{1}{\pi} $进行归一化， $ \rho $为基础反射率albedo可以采样贴图获得）</p>
+<p>$ Diffuse &#x3D; \frac{\rho}{\pi}  N \cdot L $</p>
+<p>那我们就有了这个公式需要的所有参数：</p>
+<p>1.rho采样GBufferDiffuse</p>
+<p>2.N采样GBufferNormalWorld</p>
+<p>3.L已经传入了wi，可以直接做点乘（需要限制大于0）</p>
+<p>4.$ \frac{1}{\pi} $可以用之前框架定义好的INV_PI宏</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> EvalDiffuse(<span class="type">vec3</span> wi, <span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>); </span><br><span class="line">  <span class="type">vec3</span> rho = GetGBufferDiffuse(uv);</span><br><span class="line">  <span class="type">vec3</span> worldNormal = GetGBufferNormalWorld(uv);</span><br><span class="line">  L = rho * INV_PI * <span class="built_in">max</span>(<span class="number">0.0</span>, <span class="built_in">dot</span>(worldNormal, wi));</span><br><span class="line">  <span class="keyword">return</span> L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后这个函数即渲染方程的包含cos term的BRDF</p>
+<h4 id="EvalDirectionalLight"><a href="#EvalDirectionalLight" class="headerlink" title="EvalDirectionalLight"></a>EvalDirectionalLight</h4><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> EvalDirectionalLight(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> Le = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="keyword">return</span> Le;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个函数即计算渲染方程的$ L_i 和 V $项，根据先前分析只需要将已有的常量uLightRadiance乘上Visibility即可</p>
+<h4 id="main"><a href="#main" class="headerlink" title="main()"></a>main()</h4><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">  <span class="type">float</span> s = InitRand(<span class="built_in">gl_FragCoord</span>.xy);</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  L = GetGBufferDiffuse(GetScreenCoordinate(vPosWorld.xyz));</span><br><span class="line">  <span class="type">vec3</span> color = <span class="built_in">pow</span>(<span class="built_in">clamp</span>(L, <span class="type">vec3</span>(<span class="number">0.0</span>), <span class="type">vec3</span>(<span class="number">1.0</span>)), <span class="type">vec3</span>(<span class="number">1.0</span> / <span class="number">2.2</span>));</span><br><span class="line">  <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(<span class="type">vec3</span>(color.rgb), <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>回到主函数，原框架直接获取了albedo，并没做光照计算，所以作业框架预览结果得到的是灰色块。</p>
+<p>我们此处计算最终结果，就应该将前面封装的函数结果进行调用</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">  <span class="type">float</span> s = InitRand(<span class="built_in">gl_FragCoord</span>.xy);</span><br><span class="line">  <span class="type">vec3</span> wi = <span class="built_in">normalize</span>(uLightDir);</span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="type">vec2</span> screen_uv = GetScreenCoordinate(vPosWorld.xyz);</span><br><span class="line">  <span class="type">vec3</span> fr_and_cos = EvalDiffuse(wi, screen_uv);</span><br><span class="line">  <span class="type">vec3</span> Li_and_view = EvalDirectionalLight(screen_uv);</span><br><span class="line"></span><br><span class="line">  L = fr_and_cos * Li_and_view;</span><br><span class="line">  <span class="comment">//初始结果</span></span><br><span class="line">  <span class="comment">//L = GetGBufferDiffuse(screen_uv);</span></span><br><span class="line">  <span class="type">vec3</span> color = <span class="built_in">pow</span>(<span class="built_in">clamp</span>(L, <span class="type">vec3</span>(<span class="number">0.0</span>), <span class="type">vec3</span>(<span class="number">1.0</span>)), <span class="type">vec3</span>(<span class="number">1.0</span> / <span class="number">2.2</span>));</span><br><span class="line">  <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(<span class="type">vec3</span>(color.rgb), <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到直接光照结果：</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_002.png"></p>
+<h2 id="2-屏幕空间反射SSR"><a href="#2-屏幕空间反射SSR" class="headerlink" title="2.屏幕空间反射SSR"></a>2.屏幕空间反射SSR</h2><h4 id="RayMarch"><a href="#RayMarch" class="headerlink" title="RayMarch"></a>RayMarch</h4><p>根据要求，这个部分需要使用RayMarch方法获得Camera-shadingPoint-Hit反射结果</p>
+<p>RayMarch函数什么也没给，一开始很蒙：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> RayMarch(<span class="type">vec3</span> ori, <span class="type">vec3</span> dir, <span class="keyword">out</span> <span class="type">vec3</span> hitPos) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>于是我仔细按照原理思考如何构建RayMarch每一步：</p>
+<p>首先要从着色点（ori）出发，向dir方向每次步进step，如果没有碰到就继续，碰到就停止。</p>
+<p>如何计算碰到：现在已经有了屏幕空间信息，以及世界空间信息中ori的位置</p>
+<p>那么每次ori往dir方向步进step，可以获得新的世界位置。</p>
+<p>经过之前分析框架，我们有GetScreenCoordinate函数，传入世界空间返回屏幕uv</p>
+<p>用屏幕uv可以获得GBuffer的深度图<strong>Depth</strong>，同时框架中还有GetDepth方法传入worldPos可以获得<strong>curDepth</strong></p>
+<p>这样，就可以拿uv去和深度比较，看看有没有碰到。如果uvDepth大于深度图的Depth（差的不多），就说明Ray碰到了场景物体。注意，假设步长为0.5，物体位置在5.1，那么将会有：5.0-5.5，HitPoint为5.5，所以挑选合适的精度很重要。而精度过低会导致开销大。这里课程中提到，作业有Bonus是做mipmap优化，此暂时先不提及。</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_003.png"></p>
+<p>先定义宏，规定RayMarch步长和最大步数（太远就不管了）</p>
+<p>之后按照一步步分析完成RayMarch函数即可</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> RayMarch(<span class="type">vec3</span> ori, <span class="type">vec3</span> dir, <span class="keyword">out</span> <span class="type">vec3</span> hitPos) &#123;</span><br><span class="line">  <span class="type">vec3</span> oneStep = <span class="built_in">normalize</span>(dir) * RAY_MARCH_STEP;</span><br><span class="line">  <span class="type">vec3</span> curPos = ori;</span><br><span class="line">  <span class="comment">// 当前存储的深度与当前对应的深度</span></span><br><span class="line">  <span class="type">float</span> uvGBufferDepth = <span class="number">0.0</span>;</span><br><span class="line">  <span class="type">float</span> curDepth = <span class="number">0.0</span>;</span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> curStep = <span class="number">0</span>; curStep &lt; MAX_STEP_NUM; curStep++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="comment">// 每次步进一些距离</span></span><br><span class="line">    curPos = curPos + oneStep;</span><br><span class="line">    <span class="comment">// 获得当前步进到位置的屏幕uv</span></span><br><span class="line">    uvCurScreen = GetScreenCoordinate(curPos);</span><br><span class="line">    <span class="comment">// 用worldPos获取当前深度，用屏幕uv获取当前GBuffer深度</span></span><br><span class="line">    curDepth = GetDepth(curPos);</span><br><span class="line">    uvGBufferDepth = GetGBufferDepth(uvCurScreen);</span><br><span class="line">    <span class="comment">// 作比较</span></span><br><span class="line">    <span class="keyword">if</span>(curDepth - uvGBufferDepth &gt; EPSILON)</span><br><span class="line">    &#123;</span><br><span class="line">      hitPos = curPos;</span><br><span class="line">      <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="EvalReflection"><a href="#EvalReflection" class="headerlink" title="EvalReflection"></a>EvalReflection</h4><p>还有一件事，我们要在屏幕空间管理光线从哪射入，从哪射出，之后把结果加到主函数的结果L上。</p>
+<p>那么在每个fragment，就要获取屏幕uv的worldPos作为RayMarch的ori，Camera到ShadingPoint作为wi</p>
+<p>那么需要仿照写一个函数：EvalReflection，传入wi和uv，在其中对反射方向调用RayMarch。</p>
+<p>如果RayMarch打到了，就获取并且把返回的镜面结果在main中加到L上</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">  Eval the reflection result using RayMarch</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="type">vec3</span> EvalReflection(<span class="type">vec3</span> wi, <span class="type">vec2</span> uv)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="comment">//vec3 ori = GetGBufferPosWorld(uv);</span></span><br><span class="line">  <span class="type">vec3</span> ori = vPosWorld.xyz;</span><br><span class="line">  <span class="type">vec3</span> worldNormal = GetGBufferNormalWorld(uv);</span><br><span class="line">  <span class="type">vec3</span> dir = <span class="built_in">reflect</span>(wi, worldNormal);</span><br><span class="line">  <span class="type">vec3</span> hitPos = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="keyword">if</span>(RayMarch(ori,dir, hitPos))</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="type">vec2</span> uvScreenHit = GetScreenCoordinate(hitPos);</span><br><span class="line">    <span class="type">vec3</span> colorHit = GetGBufferDiffuse(uvScreenHit);</span><br><span class="line">    <span class="keyword">return</span> colorHit;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="main-1"><a href="#main-1" class="headerlink" title="main"></a>main</h4><p>最后在main函数中设置好参数，传入EvalReflection，将最终结果加上反射结果</p>
+<p>（注释部分是测试，取消第一行L的注释就可以得到图L叠加结果的效果）：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">  <span class="type">float</span> s = InitRand(<span class="built_in">gl_FragCoord</span>.xy);</span><br><span class="line">  <span class="type">vec3</span> wi = <span class="built_in">normalize</span>(uLightDir);</span><br><span class="line">  <span class="comment">// wo为目标点到相机，为reflection的-wi</span></span><br><span class="line">  <span class="type">vec3</span> wo = <span class="built_in">normalize</span>(uCameraPos - vPosWorld.xyz);</span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="type">vec2</span> screen_uv = GetScreenCoordinate(vPosWorld.xyz);</span><br><span class="line">  <span class="type">vec3</span> fr_and_cos = EvalDiffuse(wi, screen_uv);</span><br><span class="line">  <span class="type">vec3</span> Li_and_view = EvalDirectionalLight(screen_uv);</span><br><span class="line">  <span class="type">vec3</span> reflectionRayMarch = EvalReflection(-wo, screen_uv);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//L = fr_and_cos * Li_and_view;</span></span><br><span class="line">  L += reflectionRayMarch;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//初始结果</span></span><br><span class="line">  <span class="comment">//L = GetGBufferDiffuse(screen_uv);</span></span><br><span class="line">  <span class="type">vec3</span> color = <span class="built_in">pow</span>(<span class="built_in">clamp</span>(L, <span class="type">vec3</span>(<span class="number">0.0</span>), <span class="type">vec3</span>(<span class="number">1.0</span>)), <span class="type">vec3</span>(<span class="number">1.0</span> / <span class="number">2.2</span>));</span><br><span class="line">  <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(<span class="type">vec3</span>(color.rgb), <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>先单独测试一下反射结果，摆好角度</p>
+<p>经过一番调整，得到了和作业展示需求差不多的效果</p>
+<p>最终参数为RAY_MARCH_STEP 0.05，MAX_STEP_NUM 150</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_004.png"><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_005.png"></p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_006.png" alt="L叠加结果"></p>
+<h2 id="3-间接光照"><a href="#3-间接光照" class="headerlink" title="3.间接光照"></a>3.间接光照</h2><p>第三步，需要按照作业指引的伪代码实现间接光照。</p>
+<p>目标是在main中利用之前获得的SSR计算<strong>第二次</strong>反射辐射度。也就是在上一步中，修改L的结果，给SSR反射结果加上一个反射系数，以此实现类似RayMarch-光线追踪的效果，从每个直接光照点position0发射到position1</p>
+<p>计算间接光照要求使用蒙特卡洛方法求解：</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_007.png"></p>
+<p>观察伪代码，就是随机对方向进行采样，如果<strong>相交</strong>了就返回true以及要做间接光照的hit位置position1</p>
+<p>相交即之前已经完成的SSR-RayMarch部分，可以直接用这部分的逻辑</p>
+<p>之后使用渲染方程着色L，除以最终的SAMPLE_NUM</p>
+<p>对于BRDF项，之前已经分析过，其实就是EvalDiffuse</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_008.png"></p>
+<p>好消息是：根据分析，其中蒙特卡洛要用的PDF，已经在框架中给的函数中作为out参数了</p>
+<p>同时根据之前的分析，我们应该使用带有权重的SampleHemisphereCos进行带有反射权重的采样</p>
+<p>之后进行RayMarch方法获得position0和position1</p>
+<p>根据伪代码写出来第一版错误的代码：</p>
+<p>这里有个小插曲：原因是在采样的时候，采样方向为shadingPoint本地的坐标系，故direction不能直接用在计算</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在此使用蒙特卡洛方法+SSR计算间接光照</span></span><br><span class="line">  <span class="type">vec3</span> L_indirect = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>; i&lt; SAMPLE_NUM; i++)</span><br><span class="line">  &#123;</span><br><span class="line">    <span class="type">float</span> pdf;</span><br><span class="line">    <span class="type">vec3</span> direction = SampleHemisphereCos(s, pdf);</span><br><span class="line">    <span class="type">vec3</span> hitPos;</span><br><span class="line">    <span class="keyword">if</span>(RayMarch(vPosWorld.xyz, direction, hitPos))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="type">vec2</span> uvHitPosScreen = GetScreenCoordinate(hitPos);</span><br><span class="line">      L_indirect += EvalDiffuse(direction, screen_uv)/pdf * EvalDiffuse(wi, uvHitPosScreen) * EvalDirectionalLight(uvHitPosScreen);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  L_indirect /= <span class="type">float</span>(SAMPLE_NUM);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//L += reflectionRayMarch;</span></span><br><span class="line">  L = L * L_indirect;</span><br></pre></td></tr></table></figure>
+
+<p>这样出来的代码是全黑的不能显示，也没有报错</p>
+<p>注意到，还有一个辅助函数未使用：</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_009.png"></p>
+<p>根据分析3.LocalBasis 传入一个法线向量，返回与其相互正交的两个向量，构建局部坐标系</p>
+<p>所以需要使用这个函数把direction转到世界空间</p>
+<p>这些参数的含义原理在<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/351071035">这篇文章</a>有所提及，稍微有些复杂。别人想的精妙算法确实很难理解，但作为工程师，暂时可以认为现阶段只要理解其作用即可。</p>
+<p>我将光源x调到-10，可以得到更好的观察</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_010.png" alt="spp5"></p>
+<p>SSR在课上讨论的问题，稍微观察就能立刻发现：只能反映屏幕空间，未知部分容易露馅</p>
+<p>（就跟突然开关灯一样，特别明显）</p>
+<p>如下图，观察角度几乎没变，很明显看到右侧有绿光，左图本应该也有，但由于屏幕空间隐藏了所有右侧的绿色信息，所以在效果中完全没有体现（原本是应该看到一些的）</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_011.png"><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_012.png"></p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_013.png" alt="在前面地板上有反射"><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_014.png" alt="稍微转到背面，前面地板上的反射就完全消失了"></p>
+<p>切换到cave场景，大功告成：</p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_015.png" alt="10SPP"></p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_016.png" alt="20SPP"></p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_017.png" alt="40SPP"></p>
+<p><img src="/img/GAMES202/GAMES202_Part3_Real-timeGlobalIllumination-HW/GAMES202_Part3_Real-timeGlobalIllumination-HW_018.png" alt="64SPP"></p>
+<h1 id="附：框架内文件ssrFragment分析"><a href="#附：框架内文件ssrFragment分析" class="headerlink" title="附：框架内文件ssrFragment分析"></a>附：框架内文件ssrFragment分析</h1><p>本文档为框架ssrFragment.glsl的解析<br>ssrFragment源码如下：</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#ifdef GL_ES</span></span><br><span class="line"><span class="keyword">precision</span> <span class="keyword">highp</span> <span class="type">float</span>;</span><br><span class="line"><span class="meta">#endif</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uLightDir;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uCameraPos;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uLightRadiance;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGDiffuse;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGDepth;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGNormalWorld;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGShadow;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGPosWorld;</span><br><span class="line"></span><br><span class="line"><span class="keyword">varying</span> <span class="type">mat4</span> vWorldToScreen;</span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec4</span> vPosWorld;</span><br><span class="line"></span><br><span class="line"><span class="meta">#define M_PI 3.1415926535897932384626433832795</span></span><br><span class="line"><span class="meta">#define TWO_PI 6.283185307</span></span><br><span class="line"><span class="meta">#define INV_PI 0.31830988618</span></span><br><span class="line"><span class="meta">#define INV_TWO_PI 0.15915494309</span></span><br><span class="line"></span><br><span class="line"><span class="type">float</span> Rand1(<span class="keyword">inout</span> <span class="type">float</span> p) &#123;</span><br><span class="line">  p = <span class="built_in">fract</span>(p * <span class="number">.1031</span>);</span><br><span class="line">  p *= p + <span class="number">33.33</span>;</span><br><span class="line">  p *= p + p;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">fract</span>(p);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">vec2</span> Rand2(<span class="keyword">inout</span> <span class="type">float</span> p) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="type">vec2</span>(Rand1(p), Rand1(p));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> InitRand(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> p3  = <span class="built_in">fract</span>(<span class="type">vec3</span>(uv.xyx) * <span class="number">.1031</span>);</span><br><span class="line">  p3 += <span class="built_in">dot</span>(p3, p3.yzx + <span class="number">33.33</span>);</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">fract</span>((p3.x + p3.y) * p3.z);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">vec3</span> SampleHemisphereUniform(<span class="keyword">inout</span> <span class="type">float</span> s, <span class="keyword">out</span> <span class="type">float</span> pdf) &#123;</span><br><span class="line">  <span class="type">vec2</span> uv = Rand2(s);</span><br><span class="line">  <span class="type">float</span> z = uv.x;</span><br><span class="line">  <span class="type">float</span> phi = uv.y * TWO_PI;</span><br><span class="line">  <span class="type">float</span> sinTheta = <span class="built_in">sqrt</span>(<span class="number">1.0</span> - z*z);</span><br><span class="line">  <span class="type">vec3</span> dir = <span class="type">vec3</span>(sinTheta * <span class="built_in">cos</span>(phi), sinTheta * <span class="built_in">sin</span>(phi), z);</span><br><span class="line">  pdf = INV_TWO_PI;</span><br><span class="line">  <span class="keyword">return</span> dir;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">vec3</span> SampleHemisphereCos(<span class="keyword">inout</span> <span class="type">float</span> s, <span class="keyword">out</span> <span class="type">float</span> pdf) &#123;</span><br><span class="line">  <span class="type">vec2</span> uv = Rand2(s);</span><br><span class="line">  <span class="type">float</span> z = <span class="built_in">sqrt</span>(<span class="number">1.0</span> - uv.x);</span><br><span class="line">  <span class="type">float</span> phi = uv.y * TWO_PI;</span><br><span class="line">  <span class="type">float</span> sinTheta = <span class="built_in">sqrt</span>(uv.x);</span><br><span class="line">  <span class="type">vec3</span> dir = <span class="type">vec3</span>(sinTheta * <span class="built_in">cos</span>(phi), sinTheta * <span class="built_in">sin</span>(phi), z);</span><br><span class="line">  pdf = z * INV_PI;</span><br><span class="line">  <span class="keyword">return</span> dir;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> LocalBasis(<span class="type">vec3</span> n, <span class="keyword">out</span> <span class="type">vec3</span> b1, <span class="keyword">out</span> <span class="type">vec3</span> b2) &#123;</span><br><span class="line">  <span class="type">float</span> sign_ = <span class="built_in">sign</span>(n.z);</span><br><span class="line">  <span class="keyword">if</span> (n.z == <span class="number">0.0</span>) &#123;</span><br><span class="line">    sign_ = <span class="number">1.0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="type">float</span> a = <span class="number">-1.0</span> / (sign_ + n.z);</span><br><span class="line">  <span class="type">float</span> b = n.x * n.y * a;</span><br><span class="line">  b1 = <span class="type">vec3</span>(<span class="number">1.0</span> + sign_ * n.x * n.x * a, sign_ * b, -sign_ * n.x);</span><br><span class="line">  b2 = <span class="type">vec3</span>(b, sign_ + n.y * n.y * a, -n.y);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">vec4</span> Project(<span class="type">vec4</span> a) &#123;</span><br><span class="line">  <span class="keyword">return</span> a / a.w;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> GetDepth(<span class="type">vec3</span> posWorld) &#123;</span><br><span class="line">  <span class="type">float</span> depth = (vWorldToScreen * <span class="type">vec4</span>(posWorld, <span class="number">1.0</span>)).w;</span><br><span class="line">  <span class="keyword">return</span> depth;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Transform point from world space to screen space([0, 1] x [0, 1])</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">vec2</span> GetScreenCoordinate(<span class="type">vec3</span> posWorld) &#123;</span><br><span class="line">  <span class="type">vec2</span> uv = Project(vWorldToScreen * <span class="type">vec4</span>(posWorld, <span class="number">1.0</span>)).xy * <span class="number">0.5</span> + <span class="number">0.5</span>;</span><br><span class="line">  <span class="keyword">return</span> uv;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> GetGBufferDepth(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">float</span> depth = <span class="built_in">texture2D</span>(uGDepth, uv).x;</span><br><span class="line">  <span class="keyword">if</span> (depth &lt; <span class="number">1e-2</span>) &#123;</span><br><span class="line">    depth = <span class="number">1000.0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> depth;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">vec3</span> GetGBufferNormalWorld(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> normal = <span class="built_in">texture2D</span>(uGNormalWorld, uv).xyz;</span><br><span class="line">  <span class="keyword">return</span> normal;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">vec3</span> GetGBufferPosWorld(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> posWorld = <span class="built_in">texture2D</span>(uGPosWorld, uv).xyz;</span><br><span class="line">  <span class="keyword">return</span> posWorld;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> GetGBufferuShadow(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">float</span> visibility = <span class="built_in">texture2D</span>(uGShadow, uv).x;</span><br><span class="line">  <span class="keyword">return</span> visibility;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">vec3</span> GetGBufferDiffuse(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> diffuse = <span class="built_in">texture2D</span>(uGDiffuse, uv).xyz;</span><br><span class="line">  diffuse = <span class="built_in">pow</span>(diffuse, <span class="type">vec3</span>(<span class="number">2.2</span>));</span><br><span class="line">  <span class="keyword">return</span> diffuse;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Evaluate diffuse bsdf value.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * wi, wo are all in world space.</span></span><br><span class="line"><span class="comment"> * uv is in screen space, [0, 1] x [0, 1].</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">vec3</span> EvalDiffuse(<span class="type">vec3</span> wi, <span class="type">vec3</span> wo, <span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="keyword">return</span> L;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Evaluate directional light with shadow map</span></span><br><span class="line"><span class="comment"> * uv is in screen space, [0, 1] x [0, 1].</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">vec3</span> EvalDirectionalLight(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> Le = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="keyword">return</span> Le;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> RayMarch(<span class="type">vec3</span> ori, <span class="type">vec3</span> dir, <span class="keyword">out</span> <span class="type">vec3</span> hitPos) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#define SAMPLE_NUM 1</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">  <span class="type">float</span> s = InitRand(<span class="built_in">gl_FragCoord</span>.xy);</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  L = GetGBufferDiffuse(GetScreenCoordinate(vPosWorld.xyz));</span><br><span class="line">  <span class="type">vec3</span> color = <span class="built_in">pow</span>(<span class="built_in">clamp</span>(L, <span class="type">vec3</span>(<span class="number">0.0</span>), <span class="type">vec3</span>(<span class="number">1.0</span>)), <span class="type">vec3</span>(<span class="number">1.0</span> / <span class="number">2.2</span>));</span><br><span class="line">  <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(<span class="type">vec3</span>(color.rgb), <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uLightDir;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uCameraPos;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">vec3</span> uLightRadiance;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGDiffuse;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGDepth;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGNormalWorld;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGShadow;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">sampler2D</span> uGPosWorld;</span><br><span class="line"></span><br><span class="line"><span class="keyword">varying</span> <span class="type">mat4</span> vWorldToScreen;</span><br><span class="line"><span class="keyword">varying</span> <span class="keyword">highp</span> <span class="type">vec4</span> vPosWorld;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">#define M_PI 3.1415926535897932384626433832795</span></span><br><span class="line"><span class="meta">#define TWO_PI 6.283185307</span></span><br><span class="line"><span class="meta">#define INV_PI 0.31830988618</span></span><br><span class="line"><span class="meta">#define INV_TWO_PI 0.15915494309</span></span><br></pre></td></tr></table></figure>
+
+<p>观察常量定义，给了PI和INV_PI值，INV_PI即PI的倒数，或许用于BRDF的$ \frac{\rho}{\pi} $</p>
+<p>uniform中给了5个采样贴图的sampler，以及主光源方向<strong>uLightDir</strong>，主光源强度<strong>uLightRadiance</strong>和相机位置</p>
+<h1 id="自上而下每个函数用途解析"><a href="#自上而下每个函数用途解析" class="headerlink" title="自上而下每个函数用途解析"></a>自上而下每个函数用途解析</h1><p>1.封装了Rand1,Rand2，基于扰动+种子产生伪随机数</p>
+<p>封装InitRand，传入vec2随机生成一个float随机数种子</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> Rand1(<span class="keyword">inout</span> <span class="type">float</span> p) &#123;</span><br><span class="line">  p = <span class="built_in">fract</span>(p * <span class="number">.1031</span>); <span class="comment">//取小数部分进行扰动</span></span><br><span class="line">  p *= p + <span class="number">33.33</span>;</span><br><span class="line">  p *= p + p;</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">fract</span>(p);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2. SampleHemisphereUniform和SampleHemisphereCos</p>
+<p>实现均匀采样和余弦加权采样，余弦加权采样通过<strong>正相关pdf和高度值</strong>实现</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> SampleHemisphereCos(<span class="keyword">inout</span> <span class="type">float</span> s, <span class="keyword">out</span> <span class="type">float</span> pdf) &#123;</span><br><span class="line">  <span class="type">vec2</span> uv = Rand2(s);</span><br><span class="line">  <span class="type">float</span> z = <span class="built_in">sqrt</span>(<span class="number">1.0</span> - uv.x);</span><br><span class="line">  <span class="type">float</span> phi = uv.y * TWO_PI;</span><br><span class="line">  <span class="type">float</span> sinTheta = <span class="built_in">sqrt</span>(uv.x);</span><br><span class="line">  <span class="type">vec3</span> dir = <span class="type">vec3</span>(sinTheta * <span class="built_in">cos</span>(phi), sinTheta * <span class="built_in">sin</span>(phi), z);</span><br><span class="line">  pdf = z * INV_PI;</span><br><span class="line">  <span class="keyword">return</span> dir;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.LocalBasis 传入一个法线向量，返回与其相互正交的两个向量，构建局部坐标系</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> LocalBasis(<span class="type">vec3</span> n, <span class="keyword">out</span> <span class="type">vec3</span> b1, <span class="keyword">out</span> <span class="type">vec3</span> b2) &#123;</span><br><span class="line">  <span class="type">float</span> sign_ = <span class="built_in">sign</span>(n.z);</span><br><span class="line">  <span class="keyword">if</span> (n.z == <span class="number">0.0</span>) &#123;</span><br><span class="line">    sign_ = <span class="number">1.0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="type">float</span> a = <span class="number">-1.0</span> / (sign_ + n.z);</span><br><span class="line">  <span class="type">float</span> b = n.x * n.y * a;</span><br><span class="line">  b1 = <span class="type">vec3</span>(<span class="number">1.0</span> + sign_ * n.x * n.x * a, sign_ * b, -sign_ * n.x);</span><br><span class="line">  b2 = <span class="type">vec3</span>(b, sign_ + n.y * n.y * a, -n.y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>4.Project 投影算法，返回向量除以深度值w，GetDepth传入屏幕空间下获得深度w</p>
+<p>5.GetScreenCoordinate 获得[0, 1]范围屏幕坐标</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec2</span> GetScreenCoordinate(<span class="type">vec3</span> posWorld) &#123;</span><br><span class="line">  <span class="type">vec2</span> uv = Project(vWorldToScreen * <span class="type">vec4</span>(posWorld, <span class="number">1.0</span>)).xy * <span class="number">0.5</span> + <span class="number">0.5</span>;</span><br><span class="line">  <span class="keyword">return</span> uv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="GBuffer操作"><a href="#GBuffer操作" class="headerlink" title="GBuffer操作"></a>GBuffer操作</h2><p>接下来是五个关于GBuffer的操作，从四个图片里面传入uv获得对应点数据</p>
+<p>6.GetGBufferDepth 获得几何缓冲区的深度，可以看到深度存在uGDepth纹理的x通道</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> GetGBufferDepth(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">float</span> depth = <span class="built_in">texture2D</span>(uGDepth, uv).x;</span><br><span class="line">  <span class="keyword">if</span> (depth &lt; <span class="number">1e-2</span>) &#123;</span><br><span class="line">    depth = <span class="number">1000.0</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> depth;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>GetGBufferNormalWorld，GetGBufferPosWorld，</p>
+<p>GetGBufferuShadow，GetGBufferDiffuse</p>
+<p>分别获取GBuffer的世界位置，世界法线，可见性信息，漫反射反射率（对应作业要求）</p>
+<p>注意，在计算漫反射反射率时，做了反gamma矫正，返回线性空间值。</p>
+<p>（在main有gamma矫正）</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> GetGBufferDiffuse(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> diffuse = <span class="built_in">texture2D</span>(uGDiffuse, uv).xyz;</span><br><span class="line">  diffuse = <span class="built_in">pow</span>(diffuse, <span class="type">vec3</span>(<span class="number">2.2</span>)); <span class="comment">// 反gamma校正，返回线性空间值</span></span><br><span class="line">  <span class="keyword">return</span> diffuse;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="待完成需求"><a href="#待完成需求" class="headerlink" title="待完成需求"></a>待完成需求</h2><p><strong>7.EvalDiffuse（待完成）</strong></p>
+<p>给定屏幕空间点，和其在世界空间的入射出射方向，要实现其diffuse值的计算</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Evaluate diffuse bsdf value.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * wi, wo are all in world space.</span></span><br><span class="line"><span class="comment"> * uv is in screen space, [0, 1] x [0, 1].</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">vec3</span> EvalDiffuse(<span class="type">vec3</span> wi, <span class="type">vec3</span> wo, <span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="keyword">return</span> L;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>8.EvalDirectionalLight（待完成）</strong></p>
+<p>给定屏幕空间点，计算该点的带ShadowMap后结果的光照信息</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * Evaluate directional light with shadow map</span></span><br><span class="line"><span class="comment"> * uv is in screen space, [0, 1] x [0, 1].</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">vec3</span> EvalDirectionalLight(<span class="type">vec2</span> uv) &#123;</span><br><span class="line">  <span class="type">vec3</span> Le = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  <span class="keyword">return</span> Le;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>9.RayMarch（待完成）</strong></p>
+<p>光线步进算法，给定光线，依赖光线步进找到hitPos</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> RayMarch(<span class="type">vec3</span> ori, <span class="type">vec3</span> dir, <span class="keyword">out</span> <span class="type">vec3</span> hitPos) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>-#define SAMPLE_NUM 1 定义采样数量为1</p>
+<p><strong>10.main 主函数（待完成）</strong></p>
+<p>这部分，生成了一个随机数，直接用屏幕uv获取Diffuse颜色的albedo，并没有计算光照。</p>
+<p>之后进行gamma矫正输出。</p>
+<p>还有很多工作没做</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">  <span class="type">float</span> s = InitRand(<span class="built_in">gl_FragCoord</span>.xy);</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> L = <span class="type">vec3</span>(<span class="number">0.0</span>);</span><br><span class="line">  L = GetGBufferDiffuse(GetScreenCoordinate(vPosWorld.xyz));</span><br><span class="line">  <span class="type">vec3</span> color = <span class="built_in">pow</span>(<span class="built_in">clamp</span>(L, <span class="type">vec3</span>(<span class="number">0.0</span>), <span class="type">vec3</span>(<span class="number">1.0</span>)), <span class="type">vec3</span>(<span class="number">1.0</span> / <span class="number">2.2</span>));</span><br><span class="line">  <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(<span class="type">vec3</span>(color.rgb), <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/EauDouceFish" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2025 EauDouceFish<br></p>
+                <p class="copyright text-muted">Original Theme <a target="_blank" href="http://startbootstrap.com/template-overviews/clean-blog/">Clean Blog</a> from <a href="http://startbootstrap.com/" target="_blank">Start Bootstrap</a></p>
+                <p class="copyright text-muted">Adapted for <a target="_blank" href="https://hexo.io/">Hexo</a> by <a href="http://www.codeblocq.com/" target="_blank">Jonathan Klughertz</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
