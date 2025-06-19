@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<!-- MathJax for LaTeX support -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="实时基于物理的材质：Lecture10 + Lecture11 的内容
+Lecture10课前话:
+实时渲染的PBR并非Physically-based，并且实时渲染的材质支持数量比较少
+本节课讨论2个内容：
+微表面模型与迪士尼法则的BRDF
+分为两类
+1.物体表面上的：微表面模型
+2.体积上的：云"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="EauDouceFish"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="GAMES202-实时基于物理的材质"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="实时基于物理的材质：Lecture10 + Lecture11 的内容
+Lecture10课前话:
+实时渲染的PBR并非Physically-based，并且实时渲染的材质支持数量比较少
+本节课讨论2个内容：
+微表面模型与迪士尼法则的BRDF
+分为两类
+1.物体表面上的：微表面模型
+2.体积上的：云"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="淡水鱼的山间客栈"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>GAMES202-实时基于物理的材质 - 淡水鱼的山间客栈</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">EauDouceFish's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories">
+                            
+                                Categories
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GAMES202-实时基于物理的材质</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2025-06-19
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/GAMES202/">#GAMES202</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                        
+
+<a href="/categories/GAMES202/">GAMES202</a>
+
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <p>实时基于物理的材质：Lecture10 + Lecture11 的内容</p>
+<h1 id="Lecture10"><a href="#Lecture10" class="headerlink" title="Lecture10"></a>Lecture10</h1><p>课前话:</p>
+<p>实时渲染的PBR并非Physically-based，并且实时渲染的材质支持数量比较少</p>
+<p>本节课讨论2个内容：</p>
+<p>微表面模型与迪士尼法则的BRDF</p>
+<p>分为两类</p>
+<p>1.物体表面上的：微表面模型</p>
+<p>2.体积上的：云烟雾，皮肤头发</p>
+<p>在实时渲染中，PBR理论并没有很多变化，但是为了效率，要做很多hack</p>
+<h2 id="实时渲染：微表面模型"><a href="#实时渲染：微表面模型" class="headerlink" title="实时渲染：微表面模型"></a>实时渲染：微表面模型</h2><p><a target="_blank" rel="noopener" href="https://www.yuque.com/eaudouce/oax1gw/ffhkk9gvmfg0onyn?inner=u9a091ae9">复习：微表面的BRDF</a></p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_001.png"></p>
+<p>F项(菲涅尔)：根据入射角度不同，有多少能量总共会被反射</p>
+<p>–物理上考虑S极化和P极化产生最终的效果。通常使用Schlick简单估计近似</p>
+<p>$ R(\theta) &#x3D; R_0 + (1-R_0)(1-ocs\theta)^5 $</p>
+<p>$ R_0 &#x3D; \Big(\frac{n_1 - n_2}{n_1 + n_2}\Big)^2 $其中$ n1, n2 $代表两种介质的折射率</p>
+<p>G项：Shadowing Masking，配套GGX可使用Smith Shadow Masking</p>
+<p>D项（NDF）：几种模型描述法线分布：Beckmann，GGX，etc.</p>
+<p>图2：展示模型类似的朝向分布</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_002.png"></p>
+<p><strong>Beckmann NDF</strong>：从公式来看，类似高斯函数（正态分布的通用解释）</p>
+<p>$ D(h) &#x3D; \frac{e^{- \frac{\tan^2 \theta_h}{\alpha^2}}} {\pi \alpha^2 \cos^4 \theta_h} $</p>
+<p>中间值大，两边衰减</p>
+<p>如何深入理解：对Beckmann模型的拆解：</p>
+<p>1.描述不同粗糙程度（lobe不同）</p>
+<p>高斯函数：$ \sigma $标准差</p>
+<p>Beckmann：$ \alpha $粗糙程度</p>
+<p>粗糙度越小越镜面</p>
+<p>2.$ \theta_h $为夹角：Beckmann各向同性的表示</p>
+<p>3.$ -\theta_h $表示给定方向，<strong>离法线越远，分布的就该越少</strong></p>
+<p>4.为何用$ -\tan^2{\theta_h} $？因为Beckmann定义在slope space。</p>
+<p>5.分母用于保证<strong>归一化性质</strong>。对于NDF，希望在projected solid angle上积分为1</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_003.png" alt="在此单位圆覆盖积分为1"></p>
+<p>其中的tan项是为了定义其范围映射，可以知道normal延长获得交点的距离</p>
+<p>3D情况下就是球面上切平面，后续变为在平面上定义<strong>高斯函数</strong></p>
+<p>高斯函数Support无限大，此处加入tan，定义在slope space即可对应有限角度</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_004.png"></p>
+<p><strong>GGX NDF (TR NDF)</strong></p>
+<p>有很好的长尾效果特性，常用</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_005.png"></p>
+<p>课程截图：效果对比</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_006.png"></p>
+<p>Beckmann的高光容易戛然而止，GGX高光有长尾，也更犀利、更好看</p>
+<p>（二者开销时间差别不大）</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_007.png"></p>
+<p><strong>改进后的TR：GTR，可以控制tail的大小</strong></p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_008.png"></p>
+<p><strong>Geometry项(几何修正)	Shadowing-Masking Term</strong>：</p>
+<p>这一项主要描述微表面的自遮挡相关问题：</p>
+<p><strong>左为shadowing自阴影，右为masking自遮挡</strong></p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_009.png"> </p>
+<p>G项在公式中更深入一层是，公式下方除以$ (n, i) $</p>
+<p>当入射角度为<strong>浅入射角度（grazing angle）</strong>的时候，$ (n, i) $接近0</p>
+<p>那此时如果没G项，f会极大，边缘会有异常亮光。不符合物理规律</p>
+<p>而G项带来的考虑修正了这一点，边缘会被自遮挡修正</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_010.png"></p>
+<p>在工程上使用<strong>Smith Shadowing-Masking</strong>分别考虑shadowing和masking</p>
+<p>同时考虑，是近似的：$ G(i, o, m) \approx G_1(i, m) G_1(o, m) $</p>
+<p>此为Smith Shadowing-Masking的G1项分布。</p>
+<p>可以发现，G项只有在边缘有很明显的效应：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_011.png" alt="红色Beckmann，绿色GGX"></p>
+<p>同时，理所应当的一点理解是，其也和粗糙度有关。</p>
+<p>粗糙度越低，直观理解上来说就越不容易自遮挡，所以G项就越接近1</p>
+<h2 id="BRDF模型之外的额外补偿项"><a href="#BRDF模型之外的额外补偿项" class="headerlink" title="BRDF模型之外的额外补偿项"></a>BRDF模型之外的额外补偿项</h2><p>此外，除了上述3项，还应当引入一项：</p>
+<p><strong>能量补偿项</strong></p>
+<p><strong>粗糙度</strong> 的增大会导致表面变得更加不规则，因此光线在表面上会发生<strong>更多的散射和多次反射</strong>。在 粗糙表面 上，光线的反射会变得更加分散和复杂，产生多次弹射效应</p>
+<p>而在模型中一般只考虑一次Bounce</p>
+<p>因为没有考虑多次弹射，物体粗糙度增大，带来的<strong>能量损失</strong>会越多</p>
+<p>（G项带来的能量损失）</p>
+<p>白炉测试 white furnace test可以看见结果<img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_012.png"></p>
+<p>准确的解决方案在<a target="_blank" rel="noopener" href="https://eheitzresearch.wordpress.com/240-2/">[Heitz et al. 2016]</a>提出</p>
+<p>但在实时渲染中，只考虑近似，使用<strong>The Kulla-Conty Approximation</strong></p>
+<p>核心思想为：</p>
+<p><strong>1.被遮挡等于发生下一次弹射</strong></p>
+<p><strong>2.创建一个多次反射表面反射BRDF的lobe，利用新的BRDF计算补偿</strong></p>
+<p>每次都考虑反射时的能量损失，最终反射的能量</p>
+<p><strong>假设总能量为1</strong></p>
+<p>那么每次Bounce出射能量百分比为：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_013.png"></p>
+<p>公式源自<a target="_blank" rel="noopener" href="https://fpsunflower.github.io/ckulla/data/s2017_pbs_imageworks_slides_v2.pdf">这个PDF</a>的12页</p>
+<p>以下为公式推导：把微分立体角$ \mathrm{d} \omega $换元为</p>
+<p>$ \sin \theta ,\mathrm{d} \theta , \mathrm{d} \phi &#x3D; \cos θ ,\mathrm{d}(\cosθ) ,\mathrm{d}ϕ $</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_014.png" alt="GAMES101:微分立体角推导"></p>
+<p>$ \begin{align}<br>E(\mu_o) &amp;&#x3D; \int_{\Omega+}f(\mu_o, \mu_i, \phi) \cos\theta \mathrm{d} \omega \<br>&amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{\pi}f(\mu_o, \mu_i, \phi) \cos \theta \sin \theta ,\mathrm{d}\theta_o ,\mathrm{d}\phi \<br>\end{align} $</p>
+<p><font style="color:#DF2A3F;">此处较为复杂，似乎有争议（但其实没有）最终解释会在作业中体现</font></p>
+<p>在课上介绍，这一步目标是使用$ \mu_i &#x3D; \sin \theta $替换公式中的$ \sin\theta $，则$ \cos \theta \mathrm{d} \theta &#x3D; \mathrm{d} \sin\theta $</p>
+<p>值得一提的是，原文说此处$ \mu $替换cos term，课上说$ \mu &#x3D; sin\theta $。</p>
+<p>研究许久，个人理解为，根据下方公式推导，<strong>其实</strong>$ \mu_i $<strong>代表的是</strong>$ \sin\theta $</p>
+<p>如果$ \mu_i $代表的是$ \cos\theta $，公式应该多一个负号。</p>
+<p>至于$ f(\mu_o, \mu_i, \phi) $里面的值，$ \mu_o, \mu_i $<strong>都只是代表传入一个角度，无所谓sin或者cos</strong></p>
+<p>$ \begin{align}<br>E(\mu_o)<br>&amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{1}f(\mu_o, \mu_i, \phi) \sin \theta ,\mathrm{d}\sin \theta,\mathrm{d}\phi \<br>&amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{1}f(\mu_o, \mu_i, \phi) \mu_i ,\mathrm{d}\mu _i,\mathrm{d}\phi<br>\end{align} $   </p>
+<p>这样就和图中给的公式一模一样了。</p>
+<p>那么每次Bounce<strong>出射</strong>能量百分比为<strong>：</strong>$ E(\mu_o) &#x3D; \int_{0}^{2\pi} \int_{0}^{1}f(\mu_o, \mu_i, \phi) \mu_i ,\mathrm{d}\mu_i ,\mathrm{d}\phi $</p>
+<p><strong>被遮挡的能量（缺失的能量）就是</strong>$ E_{ms}(\mu_o) &#x3D; 1 - E(\mu_0) $</p>
+<p>但是后续计算$ E_{avg} $的时候，$ \mu $似乎就是代表cos，原文也没提到sin。所以这里很奇怪，无论是自己推导还是在网搜索一圈上看别人的推导，似乎都没人给出一个很合理的解释，对于此处要么一笔带过要么就用sin项或者cos项，反正大家都能自圆其说。如果后续有更明确的理解会在此更新。</p>
+<p>对于缺失的能量，原文推导如下：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_015.png"></p>
+<p>这里在课中提到的难点就是第一步推导到第二步的过程。课上和原PDF都直接给出了这个$ f_{ms} $值</p>
+<p>这个$ f_{ms} $似乎像一个显而易见的魔法项。但我们需要知道它是怎么来的</p>
+<p>此处解释推导：</p>
+<p>对于$ f_{ms}(\mu_o, \mu_i, \phi) $这一项，由于有涉及积分方向$ \phi $，而不同方向积分结果不同，</p>
+<p>因此需要计算出<strong>不同观察方向</strong>损失的能量$ 1-E(\mu_o) $之后加上这部分的能量</p>
+<p>那么根据核心思想2，构建补偿的BRDF需要满足</p>
+<p>1.考虑可逆（reciprocity）– BRDF的对称性，<strong>即入射光和反射光的交换不会改变反射的属性</strong></p>
+<p>2.之前得出的$ E_{ms}(\mu_o) &#x3D; 1 - E(\mu_o) $</p>
+<p>根据1，有待定系数法，使用待定系数c写出：$ f_{ms}(\mu_o,\mu_i,\phi)&#x3D;c(1-E(\mu_o))(1-E(\mu_i))<br> $</p>
+<p>这样做原理是，无论是否交换$ \mu_o, \mu_i $，后两项相乘相等，其结果都不会改变</p>
+<p>如此有：</p>
+<p>$ \begin{align}<br>E_{ms}(\mu_o) &amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{1}f_{ms}(\mu_o, \mu_i, \phi) \mu_i ,\mathrm{d}\mu_i ,\mathrm{d}\phi \<br>&amp;&#x3D; 2\pi \int_{0}^{1} c(1-E(\mu_o))(1-E(\mu_i)) \mu_i ,\mathrm{d}\mu_i\<br>\end{align} $</p>
+<p>其中，$ E(\mu_o) $和积分变量$ \mu_i $无关，可以和常数项一起提取到外面</p>
+<p>$ \begin{align}<br>E_{ms}(\mu_o) &amp;&#x3D; 2\pi c(1-E(\mu_o))\int_{0}^{1}(1-E(\mu_i)) \mu_i ,\mathrm{d}\mu_i\<br>\end{align}<br> $</p>
+<p><strong>此时定义</strong>$ E_{avg} &#x3D; 2\int_{0}^{1} E(\mu) \mu \mathrm{d}\mu $<strong>，其中</strong>$ \mu &#x3D; \mu_i $<strong>即原先的</strong>$ \sin \theta $<strong>为半球上的平均，则有</strong></p>
+<p>$ \begin{align}<br>E_{ms}(\mu_o) &amp;&#x3D; \pi c(1-E(\mu_o)) (1-E_{avg})<br>\end{align}<br> $ </p>
+<p>结合2，有：$ \begin{align}<br>\pi c(1-E(\mu_o)) (1-E_{avg}) &#x3D; 1 - E(\mu_o)<br>\end{align}<br> $</p>
+<p>两边约掉，得到常数$ c &#x3D; \frac{1}{\pi (1-E_{avg})} $</p>
+<p>但此时有新的问题，$ E(\mu) $不好算，$ E_{avg} $因此也更不好算（下为最新课件）</p>
+<p>但是我们可以打表记录，只需要记录$ \mu_o, 和 ,粗糙度, \alpha ,(此处与\mu_i相关) $</p>
+<p> <img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_016.png"></p>
+<p>–如果BRDF有颜色：就会损失（吸收）</p>
+<p>所以还需要进行一个额外的计算，分成两部分考虑，由于颜色引起的能量损失</p>
+<p>找出每次反射平均每次能反射多少能量，平均Fresnel term类似$ E_{avg} $的计算</p>
+<p>$ F_{avg} &#x3D; \frac{\int_{0}^{1}F(\mu)\mu,\mathrm{d}\mu}{\int_{0}^{1}\mu ,\mathrm{d}\mu} &#x3D; 2\int_{0}^{1}F(\mu)\mu,\mathrm{d}\mu $</p>
+<p>那么由此定义，直接能看到的能量有$ F_{avg}E_{avg} $</p>
+<p>弹射一次后能看到的能量有：$ F_{avg}(1-E_{avg})\cdot F_{avg}E_{avg} $</p>
+<p>左边的$ (1-E_{avg}) $代表没出去的能量，会再发生反射（即一次Bounce）</p>
+<p>弹射K次：<img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_017.png"></p>
+<p>当K趋近于无穷，最终得出级数结果，就可以作为颜色项，乘到之前的结果上</p>
+<p>颜色项结果为：$ \frac{F_{avg}E_{avg}}{1-F_{avg}(1-E_{avg})} $</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_018.png"></p>
+<p>课程最后介绍一种好用（error）的方法：microfacet直接加上diffuse（逃）</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_019.png"></p>
+<p><strong>以上为Lecture10的内容</strong></p>
+<h1 id="Lecture11"><a href="#Lecture11" class="headerlink" title="Lecture11"></a>Lecture11</h1><h2 id="Linearly-Transformed-Cosines-（LTC）"><a href="#Linearly-Transformed-Cosines-（LTC）" class="headerlink" title="Linearly Transformed Cosines （LTC）"></a>Linearly Transformed Cosines （LTC）</h2><p>线性变换的余弦，可以用来做微表面（以及lobe定义的表面）的Shading</p>
+<p> （暂时不考虑Shadow）</p>
+<p>LTC用于解决微表面模型下，多边形光源的无Shadow结果</p>
+<p><strong>思想：通过线性变换，把BRDF的lobe和多边形光源变成余弦函数</strong></p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_020.png"></p>
+<p>此处的思想比较抽象，个人理解为可以用类似MVP空间变换的思想，对不同的内容使用矩阵进行”空间”上的线性变换，就可以在更简单的空间上进行操作</p>
+<p>使用新的方向描述原来的方向</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_021.png"></p>
+<p>此实现不考虑shadow</p>
+<p>此处仅介绍了概念，没有特别深入展开，但需要知道LTC是非常强大的解决方案</p>
+<h2 id="Disney’s-Principled-BRDF"><a href="#Disney’s-Principled-BRDF" class="headerlink" title="Disney’s Principled BRDF"></a>Disney’s Principled BRDF</h2><p>由于PBR材质对艺术家过于不友好，例如金属度等参数调节复杂，诞生了迪士尼法则的BRDF</p>
+<p>特点是对艺术家友好，但并不物理正确。</p>
+<p>但是由于在实时渲染中的PBR并不怎么讲究，姑且认为其是PBR</p>
+<p>几点设计原则：</p>
+<p>1.看起来直观，不使用物理量</p>
+<p>2.参数尽可能少</p>
+<p>3.把0-1作为合理的范围</p>
+<p>4.有必要时，可以超出0-1范围</p>
+<p>5.所有参数的组合要保证健壮</p>
+<p>独立参数表格：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_022.png"></p>
+<p>1.次表面散射，光线进入物体并从另外处打出表面，效果为BRDF比diffuse还要平</p>
+<p>2.金属性，像不像金属</p>
+<p>3.镜面反射系数，类似Ks，完全没有specular到有specular</p>
+<p>4.染色Tint：即规定镜面反射的颜色</p>
+<p>5.粗糙度：统一的</p>
+<p>6.各向异性程度anisotropic：毛刷的效果</p>
+<p>7.耀光，在grazing angle有雾化效果，绒毛效果</p>
+<p>8.耀光Tine：规定”绒毛”颜色</p>
+<p>9.清漆度：描述外层“漆包裹”感觉</p>
+<p>10.清漆光滑度：描述外层的光滑度，如果没有就不光滑（diffuse）反之更加光滑</p>
+<p>–这些参数的作用或许会重合</p>
+<p>–不太适用于实时渲染</p>
+<h2 id="Non-Photorealistic-Rendering-NPR"><a href="#Non-Photorealistic-Rendering-NPR" class="headerlink" title="Non-Photorealistic Rendering(NPR)"></a>Non-Photorealistic Rendering(NPR)</h2><p>非真实感渲染</p>
+<p>要求：快速且可靠</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_023.png"></p>
+<p>目标：制作艺术性的表现</p>
+<p>举例了许多NPR的应用</p>
+<p>总结了NPR的一些特性：</p>
+<p>1.描边</p>
+<p>2.大块简化的色块</p>
+<p>3.考虑颜色平滑过渡</p>
+<p>其他根据艺术性添加：</p>
+<p>例如表面添加线</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_024.png"></p>
+<p>NRP把边分为很多类，进行后续的描边</p>
+<p>两种方法：1.Shading2.PostProcessing</p>
+<p>描边描Silhouette边</p>
+<p>观察方向和法线几乎垂直（设置threshold）<img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_025.png"></p>
+<p>顶点法线外扩，图像后处理描边（Sobel算子）</p>
+<p>除了简单阈值化，还可以进行quantization（发现自己以前刚好做过相关的实现，效果还是很有意思）</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_026.png"></p>
+<p>素描效果：在《UnityShader入门精要》书中有介绍与实现</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_027.png"></p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials/GAMES202_Part4_Real-timePhysically-basedMaterials_028.png"></p>
+<p>最后提到了，NPR在许多时候都会不一样，定制化的，一个角色，甚至一个区域进行定制</p>
+<p>同时NPR效果很多时候需要模型本身的质量来进行配合</p>
+<p><strong>以上为Lecture11的内容</strong></p>
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/EauDouceFish" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2025 EauDouceFish<br></p>
+                <p class="copyright text-muted">Original Theme <a target="_blank" href="http://startbootstrap.com/template-overviews/clean-blog/">Clean Blog</a> from <a href="http://startbootstrap.com/" target="_blank">Start Bootstrap</a></p>
+                <p class="copyright text-muted">Adapted for <a target="_blank" href="https://hexo.io/">Hexo</a> by <a href="http://www.codeblocq.com/" target="_blank">Jonathan Klughertz</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
