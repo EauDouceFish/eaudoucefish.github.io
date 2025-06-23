@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<!-- Head tag -->
+<!-- MathJax for LaTeX support -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  },
+  svg: {
+    fontCache: 'global'
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+<head>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <!--Description-->
+
+    
+
+    
+        <meta name="description" content="作业4：实时基于物理的材质作业4是在全部课程听完后发布的，要完成关于BRDF的KullaConty模型修正
+耗时：陆陆续续做了好一阵子（休息了好一阵子，总跨度约3个月）
+思想总结首先搞清楚作业要我们做什么、以及课上讲了什么：
+BRDF由于其G项直接考虑遮蔽，只考虑一次弹射。但真正光线会在微表面之间多"/>
+    
+
+    <!--Author-->
+    
+        <meta name="author" content="EauDouceFish"/>
+    
+
+    <!--Open Graph Title-->
+    
+        <meta property="og:title" content="GAMES202-实时基于物理的材质-作业4"/>
+    
+
+    <!--Open Graph Description-->
+    
+        <meta property="og:description" content="作业4：实时基于物理的材质作业4是在全部课程听完后发布的，要完成关于BRDF的KullaConty模型修正
+耗时：陆陆续续做了好一阵子（休息了好一阵子，总跨度约3个月）
+思想总结首先搞清楚作业要我们做什么、以及课上讲了什么：
+BRDF由于其G项直接考虑遮蔽，只考虑一次弹射。但真正光线会在微表面之间多"/>
+    
+
+    <!--Open Graph Site Name-->
+        <meta property="og:site_name" content="淡水鱼的山间客栈"/>
+
+    <!--Type page-->
+    
+        <meta property="og:type" content="article"/>
+    
+
+    <!--Page Cover-->
+    
+    
+        <meta property="og:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+        <meta name="twitter:card" content="summary_large_image"/>
+
+    
+
+    
+        <meta name="twitter:image" content="https://eaudoucefish.github.ioimg/home-bg.jpg"/>
+    
+
+    <!-- Title -->
+    
+    <title>GAMES202-实时基于物理的材质-作业4 - 淡水鱼的山间客栈</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    <!-- Custom Fonts -->
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic" rel="stylesheet" type="text/css"/>
+    <link href="//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css"/>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <!-- Gallery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.css" type="text/css" rel="stylesheet"/>
+
+    <!-- Google Analytics -->
+    
+
+
+    <!-- favicon -->
+    
+
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+
+    <!-- Menu -->
+    <!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">EauDouceFish's Blog</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                
+                    <li>
+                        <a href="/">
+                            
+                                Home
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/archives">
+                            
+                                Archives
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/tags">
+                            
+                                Tags
+                            
+                        </a>
+                    </li>
+                
+                    <li>
+                        <a href="/categories">
+                            
+                                Categories
+                            
+                        </a>
+                    </li>
+                
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+    <!-- Main Content -->
+    <!-- Page Header -->
+<!-- Set your background image for this header in your post front-matter: cover -->
+
+<header class="intro-header" style="background-image: url('/img/home-bg.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <h1>GAMES202-实时基于物理的材质-作业4</h1>
+                    
+                    <span class="meta">
+                        <!-- Date and Author -->
+                        
+                        
+                            2025-06-23
+                        
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+            <!-- Tags and categories -->
+           
+                <div class="col-lg-4 col-lg-offset-2 col-md-5 col-md-offset-1 post-tags">
+                    
+                        
+
+
+<a href="/tags/GAMES202/">#GAMES202</a>
+
+
+                    
+                </div>
+                <div class="col-lg-4 col-md-5 post-categories">
+                    
+                        
+
+<a href="/categories/GAMES202/">GAMES202</a>
+
+                    
+                </div>
+            
+
+            <!-- Gallery -->
+            
+
+            <!-- Post Main Content -->
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <h1 id="作业4：实时基于物理的材质"><a href="#作业4：实时基于物理的材质" class="headerlink" title="作业4：实时基于物理的材质"></a>作业4：实时基于物理的材质</h1><p>作业4是在全部课程听完后发布的，要完成关于BRDF的KullaConty模型修正</p>
+<p>耗时：陆陆续续做了好一阵子（休息了好一阵子，总跨度约3个月）</p>
+<h1 id="思想总结"><a href="#思想总结" class="headerlink" title="思想总结"></a>思想总结</h1><p>首先搞清楚作业要我们做什么、以及课上讲了什么：</p>
+<p>BRDF由于其G项<strong>直接考虑遮蔽</strong>，只考虑<strong>一次弹射</strong>。但真正光线会在微表面之间多次弹射</p>
+<p>所以对于越粗糙的物体，G项遮蔽计算程度越大，因而<strong>能量会损失</strong>越多，看着越暗</p>
+<p>所以引入KullaConty的BRDF模型来补偿能量。</p>
+<p>这个模型核心是计算 BRDF 的<strong>补偿项 fms</strong>，而 fms 的计算需要$ E_\mu $和$ E_{avg} $两个<strong>前置变量</strong></p>
+<p>通过前置变量的预计算打表，实时计算后续补偿结果。</p>
+<p>所以我们要在离线端计算出与<strong>粗糙度</strong>有关的$ E_{\mu} $和$ E_{avg} $之后，在实时端计算补偿项。</p>
+<h1 id="框架-流程"><a href="#框架-流程" class="headerlink" title="框架-流程"></a>框架-流程</h1><h2 id="回顾公式"><a href="#回顾公式" class="headerlink" title="回顾公式"></a>回顾公式</h2><p>要计算缺失的能量，需要再次回顾论文公式，下是计算补偿的公式：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_001.png"></p>
+<p>其中有：</p>
+<p>$ f_{ms}(\mu_o,\mu_i,\phi)&#x3D;c(1-E(\mu_o))(1-E(\mu_i)) $</p>
+<p>$ c &#x3D; \frac{1}{\pi (1-E_{avg})} $</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_002.png"></p>
+<h3 id="μ的含义"><a href="#μ的含义" class="headerlink" title="μ的含义"></a>μ的含义</h3><p>首先要提一嘴，$ \mu $通常代表<strong>法线与某个方向夹角的余弦，比如这里的</strong>$ \mu_o $<strong>和</strong>$ \mu_i $</p>
+<hr>
+<p>在前面我们也分析过，就是要制作一张$ \mu_o $和粗糙度$ \alpha &#x3D; \mu_i $的表</p>
+<p>对应作业所说的：</p>
+<p>完成Kulla-Conty BRDF 模型，关键在于计算BRDF 的补偿项fms，而fms</p>
+<p>的计算需要E(μ) 和Eavg 两个前置变量。由此本轮作业将分为以下两个部分：</p>
+<p>• 在离线端(lut-gen 文件夹中) 预计算E(μ) 和Eavg。</p>
+<p>• 在实时端(homework4 文件夹中) 通过查询预计算数据构建BRDF 的补偿项。</p>
+<p>这个$ E(\mu) $与$ \mu_o,\mu_i $有关，而$ E_{avg} $只和$ \mu_i $有关，所以离线端打表，实时端查询获得$ E(\mu) 和E_{avg} $即可</p>
+<h2 id="预计算-E-mu（蒙特卡洛）的LUT"><a href="#预计算-E-mu（蒙特卡洛）的LUT" class="headerlink" title="预计算 E_mu（蒙特卡洛）的LUT"></a>预计算 E_mu（蒙特卡洛）的LUT</h2><h3 id="阅读框架"><a href="#阅读框架" class="headerlink" title="阅读框架"></a>阅读框架</h3><p>第一个任务是在Emu_MC操作函数。注意是作业最后一个文件。</p>
+<h4 id="E-mu用在哪里"><a href="#E-mu用在哪里" class="headerlink" title="E_mu用在哪里"></a>E_mu用在哪里</h4><p>任务1是给了Vec3f V, float roughness, float NdotV, Vec3f Ei的情况下，计算$ E(\mu) $</p>
+<p>计算公式就是$ \begin{align}<br>E(\mu_o)<br>&amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{1}f(\mu_o, \mu_i, \phi) \mu_i ,\mathrm{d}\mu _i,\mathrm{d}\phi<br>\end{align} $</p>
+<p>在这里可以从main找到函数传入参数的含义，了解整个逻辑：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_003.png"></p>
+<p>在这段逻辑中，遍历了每个像素点中心部分，通过NdotV，在向量归一化时候，就是$ \cos \theta $对应从0到1的值</p>
+<p>那么贴图横方向就代表粗糙度，纵方向代表角度$ \cos \theta $</p>
+<p>看了下getEmu函数，似乎并不需要传入NdotV，alpha和粗糙度，这里可能像之前一样有些冗余</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Vec3f <span class="title">getEmu</span><span class="params">(<span class="type">int</span> x, <span class="type">int</span> y, <span class="type">int</span> alpha, <span class="type">unsigned</span> <span class="type">char</span> *data, <span class="type">float</span> NdotV, <span class="type">float</span> roughness)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Vec3f</span>(data[<span class="number">3</span> * (resolution * x + y) + <span class="number">0</span>],</span><br><span class="line">                 data[<span class="number">3</span> * (resolution * x + y) + <span class="number">1</span>],</span><br><span class="line">                 data[<span class="number">3</span> * (resolution * x + y) + <span class="number">2</span>]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以这里做的事情就是，这个函数会<strong>加载读取一张图片</strong>(“.&#x2F;GGX_E_MC_LUT.png”)也就是Edata</p>
+<p>图片返回一个值，作为Ei。resolution - 1 - i做了反转</p>
+<p>那么最后计算平均值$ E_{avg} $会用到$ E(\mu) $之后写回图片</p>
+<h4 id="在哪计算"><a href="#在哪计算" class="headerlink" title="在哪计算"></a>在哪计算</h4><p>从之前部分和主函数就可以看出，逻辑就是我们要完成IntegrateBRDF函数，也就是对其积分，之后把预计算积分好的BRDF的irradiance<strong>存入一张图片</strong>(“.&#x2F;GGX_E_MC_LUT.png”)，这个图会在求$ E_{avg} $时候getEmu来读取。</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_004.png" alt="主函数"></p>
+<p>那么在85行的需求也是非常明确，让使用给定的BRDF模型+蒙特卡洛积分来计算结果</p>
+<h3 id="计算BRDF"><a href="#计算BRDF" class="headerlink" title="计算BRDF"></a>计算BRDF</h3><p>对于给定的BRDF模型，直接按需求列出公式代码即可。回味公式：</p>
+<p>$ f_r(i, o) &#x3D; \frac{F(i, h)G(i, o, h)D(h)}{4(n \cdot i)(n \cdot o)} $</p>
+<p>F选用Schlick近似，D选用GGX法线分布，G选用匹配GGX分布的Smith模型</p>
+<p>有个非常好的消息是，对于每个项需要的信息算法，已经封装好了不需要自己实</p>
+<p>F求的是所有反射出的能量，所以不用反射，直接取1即可</p>
+<p>D项直接调用函数：DistributionGGX，就可以使用GGX模型</p>
+<p>G项是Smith模型。也直接调用</p>
+<p>之后就是对这个fr进行积分。积分自然是使用蒙特卡洛积分。</p>
+<p>蒙特卡洛积分即我们要把每个采样的最终结果除以PDF，再加起来就能得到最终结果。</p>
+<p>在处理积分前，还需要根据原公式，把项乘上mu_i</p>
+<p>$ E(\mu_o) &#x3D; \int_{0}^{2\pi} \int_{0}^{1}f(\mu_o, \mu_i, \phi) \mu_i ,\mathrm{d}\mu_i ,\mathrm{d}\phi $</p>
+<p>阅读框架可以发现，PDF已经给好了，只需要调用即可</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">samplePoints <span class="title">squareToCosineHemisphere</span><span class="params">(<span class="type">int</span> sample_count)</span></span>&#123;</span><br><span class="line"><span class="comment">//省略之前部分...</span></span><br><span class="line">            samlpeList.directions.<span class="built_in">push_back</span>(wi);</span><br><span class="line">            samlpeList.PDFs.<span class="built_in">push_back</span>(pdf);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> samlpeList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> fr = F*D*G / (<span class="number">4.0</span> * NdotL * NdotV);</span><br><span class="line">      <span class="comment">// 使用μi代替sin_theta</span></span><br><span class="line">      <span class="comment">//float mu_i = sqrt(1 - NdotL*NdotL);</span></span><br><span class="line">      <span class="type">float</span> cos_theta_i = NdotL;</span><br><span class="line">      <span class="type">float</span> contribution = fr * cos_theta_i / pdf;</span><br><span class="line">      A += contribution;</span><br><span class="line">      B += contribution;</span><br><span class="line">      C += contribution;</span><br></pre></td></tr></table></figure>
+
+<p>最后在原build之后运行exe就能得到图片。</p>
+<h3 id="公式解决疑惑"><a href="#公式解决疑惑" class="headerlink" title="公式解决疑惑"></a>公式解决疑惑</h3><p>我们会发现，上述公式，只有在令$ \mu_i &#x3D; \cos \theta $的时候，得到的图片结果与预期匹配正确。</p>
+<p>但这似乎和课上说的替换$ \mu_i &#x3D; \sin \theta $，以及之前的推导不匹配。所以此处分析一下，可以顺带解决之前的疑惑：</p>
+<p>对于这个公式，是一个<strong>二重积分</strong>，那pdf要计算里外两个，但只算了一个？</p>
+<p>是因为在蒙特卡洛积分的时候，计算的PDF是每个<strong>立体角方向的PDF</strong>，实际上是对公式已经做了简化。</p>
+<p>也就是说，我们积分对象是$ \mathrm{d} \omega $。回顾最开始的公式是这样的：<br>$ \begin{align} E(\mu_o) &amp;&#x3D; \int_{\Omega+}f(\mu_o, \mu_i, \phi) \cos\theta \mathrm{d} \omega \ &amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{\pi}f(\mu_o, \mu_i, \phi) \cos \theta \sin \theta ,\mathrm{d}\theta ,\mathrm{d}\phi \ &amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{1}f(\mu_o, \mu_i, \phi) \sin \theta ,\mathrm{d}\sin \theta,\mathrm{d}\phi \ &amp;&#x3D; \int_{0}^{2\pi} \int_{0}^{1}f(\mu_o, \mu_i, \phi) \mu_i ,\mathrm{d}\mu _i,\mathrm{d}\phi \end{align} $</p>
+<p>可以看到，课程内$ \mu_i $确实是替换的$ \sin \theta $</p>
+<p>而我们的代码，先前使用的是对半球的采样：squareToCosineHemisphere，配套的PDF也是对应在半球的立体角上的，而不是单独给$ \theta $与$ \phi $积分。这样PDF只要算一个，替换的值也是直接替换cos，就符合了。</p>
+<p>而这本质上，其实是对前面第一个<strong>公式原始形式</strong>$ \mathrm{d} {\omega} $进行的积分</p>
+<p>所以在fr之后要乘的项也确实是$ \cos \theta $而不是$ \sin \theta $</p>
+<p>我们说的$ \mu_i $替换$ \sin \theta $实则是第四个公式的形式，是对立体角拆出来的积分。这样的推导形式只是用于理解，而实际上代码中还是替换cos</p>
+<h3 id="构建工程"><a href="#构建工程" class="headerlink" title="构建工程"></a>构建工程</h3><p>windows下我们使用 cmake -G “MinGW Makefiles” .. 命令以在build下构建工程</p>
+<p>之后使用mingw32-make即可（Linux使用make）<img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_005.png"></p>
+<p>之后运行其下的exe，就可以获得计算结果（有噪声）</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_006.png" alt="计算结果"></p>
+<h2 id="预计算-E-mu-（重要性采样）的LUT"><a href="#预计算-E-mu-（重要性采样）的LUT" class="headerlink" title="预计算 E_mu （重要性采样）的LUT"></a>预计算 E_mu （重要性采样）的LUT</h2><h3 id="为什么要重要性采样"><a href="#为什么要重要性采样" class="headerlink" title="为什么要重要性采样"></a>为什么要重要性采样</h3><p>这个项下方有明显噪声。在生成后续的图中效果很差，原因在PDF文件中说明明确：</p>
+<p>由于微表面法线分布在粗糙程度低时，其<strong>总体分布</strong>与实际使用的<strong>采样方向</strong>相差甚远</p>
+<p>怎么理解呢？比如一个表面向上的物体，总体的微表面方向肯定是向上的居多。</p>
+<p>而我们总体采样却是每个方向都采一下。那样大部分采样的方向，都和总体方向不匹配。</p>
+<p>所以需要使用<strong>重要性采样</strong>，在微表面法线分布多的地方多采样一些方向</p>
+<h3 id="如何实践"><a href="#如何实践" class="headerlink" title="如何实践"></a>如何实践</h3><p>故此处还需要完成Bonus1的任务：重要性采样</p>
+<p>重要性采样的思想即，<strong>在对结果影响占比大的地方，要多采样一些。</strong></p>
+<p>我们只需要做到两步：</p>
+<p>1.定义哪些地方要多采样</p>
+<p>2.考虑这种采样分布下的配套pdf是什么</p>
+<p>那么如何决定<strong>采样方向以及配套的pdf</strong>，也就是如何定义哪些地方“对结果影响占比大”就是接下来讨论并要解决的问题。在要求中给出了解决办法：</p>
+<p>1.定义采样方向</p>
+<p>采样方向即光线入射方向i</p>
+<p>我们不知道i，但是我们知道 出射方向o 与 半程向量-即微表面法向m</p>
+<p>通过简单几何推导公式$ i &#x3D; 2(m \cdot o) m − o $代入即可计算出i</p>
+<p>此时，作业文档给了一个提要：根据NDF的性质，有一个等式：</p>
+<p>$ \int_{\Omega} D(m)(m \cdot n) ,\mathrm{d} \omega_m &#x3D; 1 $</p>
+<p>这个性质也很好理解。</p>
+<p>这个公式表示所有<strong>微表面法线</strong> m 对<strong>宏观表面法线</strong> n 的投影面积的贡献。</p>
+<p>对于每个微表面单独观察的微法线m来说，其在每个方向上投影到最终呈现的方向结果上的积分，在符合归一化之后就是等于1，<font style="color:rgb(64, 64, 64);">总投影面积与宏观表面的面积一致，这是能量守恒的体现</font></p>
+<p><font style="color:rgb(64, 64, 64);">根据这个公式，就知道我们可以得到法线m的pdf，而这个pdf是用来计算采样点的。</font></p>
+<p><font style="color:rgb(64, 64, 64);">不过在这里，作业很贴心，直接给出了在球面的</font><strong><font style="color:rgb(64, 64, 64);">采样点生成的公式</font></strong><font style="color:rgb(64, 64, 64);">，拿过来使用即可：</font></p>
+<p>$ \theta_m &#x3D; sqrt(\xi) $</p>
+<p>利用这个采样点公式，我们直接可以计算出球面采样点：[Step1]</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// xi stores xi_1 and xi_2 in &#123;x, y&#125;</span></span><br><span class="line"><span class="function">Vec3f <span class="title">ImportanceSampleGGX</span>(<span class="params">Vec2f xi, Vec3f N, <span class="built_in">float</span> roughness</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">float</span> a = roughness * roughness;</span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> in spherical space - Bonus 1</span></span><br><span class="line">    <span class="built_in">float</span> theta_m = atan(a * sqrt(xi.x) / sqrt(<span class="number">1</span> - xi.x));</span><br><span class="line">    <span class="built_in">float</span> phi_h = <span class="number">2.0</span> * PI * xi.y;</span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> from spherical space to cartesian space - Bonus 1</span></span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> tangent coordinates - Bonus 1</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> transform H to tangent space - Bonus 1</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> Vec3f(<span class="number">1.0f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>后续步骤在注释中说明了，是将球面采样点转化到局部笛卡尔坐标。[Step2]</p>
+<p>之后由于我们现在的计算都是在局部坐标（切线空间）做的，要构造TBN矩阵 [Step3]</p>
+<p>这样就可以将切线空间下的H转化到世界空间 [Step4]（最后一步注释应是有误）</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_007.png" alt="LearnOpenGL中的参考"></p>
+<p>球面空间转化到笛卡尔坐标系，按照公式分配即可：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_008.png" alt="θ、φ转化为xyz的公式"></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Vec3f <span class="title">ImportanceSampleGGX</span>(<span class="params">Vec2f xi, Vec3f N, <span class="built_in">float</span> roughness</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">float</span> a = roughness * roughness;</span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> in spherical space - Bonus 1</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">float</span> theta_m = atan(a * sqrt(xi.x) / sqrt(<span class="number">1</span> - xi.x));</span><br><span class="line">    <span class="built_in">float</span> phi_h = <span class="number">2.0</span> * PI * xi.y;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> from spherical space to cartesian space - Bonus 1</span></span><br><span class="line">    Vec3f H_local;</span><br><span class="line">    H_local.x = sin(theta_m) * cos(phi_h);</span><br><span class="line">    H_local.y = sin(theta_m) * sin(phi_h);</span><br><span class="line">    H_local.z = cos(theta_m);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> tangent coordinates - Bonus 1</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> transform H to tangent space - Bonus 1</span></span><br><span class="line">    <span class="keyword">return</span> Vec3f(<span class="number">1.0f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>之后构造<strong>TBN矩阵</strong>，以将物体从切线空间转化为世界空间</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Mat3 TBN = Mat3(tangent, bitangent, normal);</span><br><span class="line"><span class="comment">// 切线空间（本地）-&gt;世界空间</span></span><br><span class="line">Vec3 worldVec = TBN * localVec;</span><br><span class="line"><span class="comment">// 世界空间 -&gt; 切线空间（本地）</span></span><br><span class="line">Vec3 localVec = transpose(TBN) * worldVec;</span><br></pre></td></tr></table></figure>
+
+<p>（似乎作业没给矩阵库，直接用向量对应相乘即可）记得修改注释</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Vec3f <span class="title">ImportanceSampleGGX</span>(<span class="params">Vec2f xi, Vec3f N, <span class="built_in">float</span> roughness</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">float</span> a = roughness * roughness;</span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> in spherical space - Bonus 1</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">float</span> theta_m = atan(a * sqrt(xi.x) / sqrt(<span class="number">1</span> - xi.x));</span><br><span class="line">    <span class="built_in">float</span> phi_h = <span class="number">2.0</span> * PI * xi.y;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> from spherical space to cartesian space - Bonus 1</span></span><br><span class="line">    Vec3f H_local;</span><br><span class="line">    H_local.x = sin(theta_m) * cos(phi_h);</span><br><span class="line">    H_local.y = sin(theta_m) * sin(phi_h);</span><br><span class="line">    H_local.z = cos(theta_m);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> tangent coordinates - Bonus 1</span></span><br><span class="line">    Vec3f up        = abs(N.z) &lt; <span class="number">0.999</span> ? Vec3f(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>) : Vec3f(<span class="number">1.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>);</span><br><span class="line">    Vec3f tangent   = normalize(cross(up, N));</span><br><span class="line">    Vec3f bitangent = cross(N, tangent);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//<span class="doctag">TODO:</span> transform H from tangent space to world - Bonus 1</span></span><br><span class="line">    Vec3f sample_vec = tangent * H_local.x + bitangent * H_local.y + N * H_local.z;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> Vec3f(sample_vec);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，根据作业推导的权重信息，在BRDF积分中进行计算：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_009.png"></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Vec3f <span class="title">IntegrateBRDF</span>(<span class="params">Vec3f V, <span class="built_in">float</span> roughness</span>)</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">const</span> <span class="built_in">int</span> sample_count = <span class="number">1024</span>;</span><br><span class="line">    <span class="function">Vec3f <span class="title">Emu</span>(<span class="params"><span class="number">0.0f</span></span>)</span>;</span><br><span class="line">    Vec3f N = Vec3f(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="built_in">int</span> i = <span class="number">0</span>; i &lt; sample_count; i++) &#123;</span><br><span class="line">        Vec2f xi = Hammersley(i, sample_count);</span><br><span class="line">        Vec3f H = ImportanceSampleGGX(xi, N, roughness);</span><br><span class="line">        Vec3f L = normalize(H * <span class="number">2.0f</span> * dot(V, H) - V);</span><br><span class="line"></span><br><span class="line">        <span class="built_in">float</span> NoL = std::max(L.z, <span class="number">0.0f</span>);</span><br><span class="line">        <span class="built_in">float</span> NoH = std::max(H.z, <span class="number">0.0f</span>);</span><br><span class="line">        <span class="built_in">float</span> VoH = std::max(dot(V, H), <span class="number">0.0f</span>);</span><br><span class="line">        <span class="built_in">float</span> NoV = std::max(dot(N, V), <span class="number">0.0f</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 此处计算权重</span></span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> To calculate (fr * ni) / p_o here - Bonus 1</span></span><br><span class="line">        <span class="built_in">float</span> G = GeometrySmith(roughness, NoV, NoL);</span><br><span class="line">        <span class="built_in">float</span> weight = VoH * G / (NoV * NoH);</span><br><span class="line">        Emu += Vec3f(<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>) * weight;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Split Sum - Bonus 2</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Vec3f(Emu/sample_count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_010.png" alt="重要性采样，获得没噪声的结果">	<img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_011.png" alt="对比：普通蒙特卡洛有噪声结果"></p>
+<p>可以看到效果非常不错</p>
+<p>注意到，有个Bonus2，是使用SplitSum来计算。这个后续提到。</p>
+<h2 id="预计算E-avg（蒙特卡洛-重要性采样）的LUT"><a href="#预计算E-avg（蒙特卡洛-重要性采样）的LUT" class="headerlink" title="预计算E_avg（蒙特卡洛+重要性采样）的LUT"></a>预计算E_avg（蒙特卡洛+重要性采样）的LUT</h2><p>如果不知道参数的含义，做作业就会头疼。前面我们提到过，$ \mu $就是方向和法线夹角余弦</p>
+<p>这里的【方向】就是观察方向，那么$ \mu $项就是NdotV，中间那些混淆的都可以删了</p>
+<p>知道这一点以后，我们配合公式：</p>
+<p>$ E_{avg} &#x3D;  2\int_{0}^{1}E(\mu)\mu \mathrm{d} \mu $</p>
+<p>就可以利用Eavg_MC中的NdotV参数迅速算出Eavg项。</p>
+<p>代码中的积分都是累加再除以总数，所以简单相乘即可，记得公式中 * 2</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="function">Vec3f <span class="title">IntegrateEmu</span><span class="params">(Vec3f V, <span class="type">float</span> roughness, <span class="type">float</span> NdotV, Vec3f Ei)</span> </span>&#123;</span><br><span class="line">    Vec3f Eavg = <span class="built_in">Vec3f</span>(<span class="number">0.0f</span>);</span><br><span class="line">    <span class="type">const</span> <span class="type">int</span> sample_count = <span class="number">1024</span>;</span><br><span class="line">    <span class="comment">// Vec3f N = Vec3f(0.0, 0.0, 1.0);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// samplePoints sampleList = squareToCosineHemisphere(sample_count);</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; sample_count; i++) &#123;</span><br><span class="line">        <span class="comment">// 本质上是mu</span></span><br><span class="line">        <span class="comment">// Vec3f L = sampleList.directions[i];</span></span><br><span class="line">        <span class="comment">// Vec3f H = normalize(V + L);</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// float NoL = std::max(L.z, 0.0f);</span></span><br><span class="line">        <span class="comment">// float NoH = std::max(H.z, 0.0f);</span></span><br><span class="line">        <span class="comment">// float VoH = std::max(dot(V, H), 0.0f);</span></span><br><span class="line">        <span class="comment">// float NoV = std::max(dot(N, V), 0.0f);</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> To calculate Eavg here</span></span><br><span class="line">        Vec3f E_mu = Ei;</span><br><span class="line">        <span class="type">float</span> mu = NdotV;</span><br><span class="line">        Eavg += E_mu * mu * <span class="number">2.0f</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 除以行宽</span></span><br><span class="line">    <span class="keyword">return</span> Eavg / sample_count;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>我们可以稍微对文件做一下修改，增加一个进度条，同时将使用蒙特卡洛方法的Eavg图片单独路径保存避免覆盖</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">printProgress</span><span class="params">(<span class="type">int</span> current, <span class="type">int</span> total)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> barWidth = <span class="number">50</span>; <span class="comment">// 进度条宽度</span></span><br><span class="line">    <span class="type">float</span> progress = <span class="built_in">float</span>(current) / <span class="built_in">float</span>(total);</span><br><span class="line">    <span class="type">int</span> pos = <span class="built_in">int</span>(barWidth * progress);</span><br><span class="line"></span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\r[&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; barWidth; ++i) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i &lt; pos) std::cout &lt;&lt; <span class="string">&quot;=&quot;</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (i == pos) std::cout &lt;&lt; <span class="string">&quot;&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">else</span> std::cout &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;] &quot;</span> &lt;&lt; <span class="built_in">int</span>(progress * <span class="number">100.0</span>) &lt;&lt; <span class="string">&quot; %&quot;</span>;</span><br><span class="line">    std::cout.<span class="built_in">flush</span>();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> *Edata = <span class="built_in">stbi_load</span>(<span class="string">&quot;./GGX_E_MC_LUT.png&quot;</span>, &amp;resolution, &amp;resolution, &amp;channel, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">if</span> (Edata == <span class="literal">NULL</span>) </span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;ERROE_FILE_NOT_LOAD&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> </span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Resolution: &quot;</span> &lt;&lt; resolution &lt;&lt; <span class="string">&quot;*&quot;</span> &lt;&lt; resolution &lt;&lt; <span class="string">&quot; Channel: &quot;</span> &lt;&lt; channel &lt;&lt; std::endl;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;Creating the LUT...&quot;</span> &lt;&lt; std::endl;</span><br><span class="line">        <span class="comment">// | -----&gt; mu(j)</span></span><br><span class="line">        <span class="comment">// | </span></span><br><span class="line">        <span class="comment">// | rough（i）</span></span><br><span class="line">        <span class="comment">// flip it if you want to write the data on picture </span></span><br><span class="line">        <span class="type">uint8_t</span>* data = <span class="keyword">new</span> <span class="type">uint8_t</span>[resolution * resolution * <span class="number">3</span>];</span><br><span class="line">        <span class="type">float</span> step = <span class="number">1.0</span> / resolution;</span><br><span class="line">        Vec3f Eavg = <span class="built_in">Vec3f</span>(<span class="number">0.0</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; resolution; i++) </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="type">float</span> roughness = step * (<span class="built_in">static_cast</span>&lt;<span class="type">float</span>&gt;(i) + <span class="number">0.5f</span>);</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">0</span>; j &lt; resolution; j++) </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="type">float</span> NdotV = step * (<span class="built_in">static_cast</span>&lt;<span class="type">float</span>&gt;(j) + <span class="number">0.5f</span>);</span><br><span class="line">                Vec3f V = <span class="built_in">Vec3f</span>(std::<span class="built_in">sqrt</span>(<span class="number">1.f</span> - NdotV * NdotV), <span class="number">0.f</span>, NdotV);</span><br><span class="line"></span><br><span class="line">                Vec3f Ei = <span class="built_in">getEmu</span>((resolution - <span class="number">1</span> - i), j, <span class="number">0</span>, Edata, NdotV, roughness);</span><br><span class="line">                Eavg += <span class="built_in">IntegrateEmu</span>(V, roughness, NdotV, Ei) * step;</span><br><span class="line">                <span class="built_in">setRGB</span>(i, j, <span class="number">0.0</span>, data);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span>(<span class="type">int</span> k = <span class="number">0</span>; k &lt; resolution; k++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="built_in">setRGB</span>(i, k, Eavg, data);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            Eavg = <span class="built_in">Vec3f</span>(<span class="number">0.0</span>);</span><br><span class="line">            <span class="built_in">printProgress</span>(i + <span class="number">1</span>, resolution);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">stbi_flip_vertically_on_write</span>(<span class="literal">true</span>);</span><br><span class="line">        <span class="built_in">stbi_write_png</span>(<span class="string">&quot;GGX_Eavg_MC_LUT.png&quot;</span>, resolution, resolution, channel, data, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">stbi_image_free</span>(Edata);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_012.png"></p>
+<p>我们将这个IntegrateEmu和ImportanceSampleGGX函数复制，粘贴覆盖到Eavg_IS里面，mingw32-make运行程序，即可得到有噪声和无噪声的两张图片对比：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_013.png" alt="得到有噪声的结果"><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_014.png" alt="无噪声的结果"></p>
+<h2 id="实时端计算补充BRDF"><a href="#实时端计算补充BRDF" class="headerlink" title="实时端计算补充BRDF"></a>实时端计算补充BRDF</h2><p>这个部分有两个内容要完成：</p>
+<p>1.完成基础PBR的材质（用之前给的微表面模型公式）</p>
+<p>2.完成KullaConty补偿项的添加</p>
+<h3 id="1-完成PBR的材质：微表面模型BRDF"><a href="#1-完成PBR的材质：微表面模型BRDF" class="headerlink" title="1.完成PBR的材质：微表面模型BRDF"></a>1.完成PBR的材质：微表面模型BRDF</h3><p>这部分只需要照搬照抄公式，完成微表面模型</p>
+<p>（1）F项</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> fresnelSchlick(<span class="type">vec3</span> F0, <span class="type">vec3</span> V, <span class="type">vec3</span> H)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">float</span> cosTheta = <span class="built_in">clamp</span>(<span class="built_in">dot</span>(V, H), <span class="number">0.0</span>, <span class="number">1.0</span>);</span><br><span class="line">    <span class="keyword">return</span> F0 + (<span class="number">1.0</span> - F0) * <span class="built_in">pow</span>(<span class="number">1.0</span> - cosTheta, <span class="number">5.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>（2）D项（NDF项）：使用GGX模型</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> DistributionGGX(<span class="type">vec3</span> N, <span class="type">vec3</span> H, <span class="type">float</span> roughness)</span><br><span class="line">&#123;</span><br><span class="line">   <span class="comment">// <span class="doctag">TODO:</span> To calculate GGX NDF here</span></span><br><span class="line">    <span class="type">float</span> a = roughness*roughness;</span><br><span class="line">    <span class="type">float</span> a2 = a*a;</span><br><span class="line">    <span class="type">float</span> NdotH = <span class="built_in">max</span>(<span class="built_in">dot</span>(N, H), <span class="number">0.0</span>);</span><br><span class="line">    <span class="type">float</span> NdotH2 = NdotH*NdotH;</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> nom   = a2;</span><br><span class="line">    <span class="type">float</span> denom = (NdotH2 * (a2 - <span class="number">1.0</span>) + <span class="number">1.0</span>);</span><br><span class="line">    denom = PI * denom * denom;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nom / <span class="built_in">max</span>(denom, <span class="number">0.0001</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>（3）G项：使用Smith，配套GGX的Schlick近似</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> GeometrySchlickGGX(<span class="type">float</span> NdotV, <span class="type">float</span> roughness)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> To calculate Smith G1 here</span></span><br><span class="line">    <span class="type">float</span> a = roughness;</span><br><span class="line">    <span class="type">float</span> k = (a * a) / <span class="number">2.0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> nom = NdotV;</span><br><span class="line">    <span class="type">float</span> denom = NdotV * (<span class="number">1.0</span> - k) + k;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nom / denom;;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">float</span> GeometrySmith(<span class="type">vec3</span> N, <span class="type">vec3</span> V, <span class="type">vec3</span> L, <span class="type">float</span> roughness)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// <span class="doctag">TODO:</span> To calculate Smith G here</span></span><br><span class="line">    <span class="type">float</span> NdotV = <span class="built_in">dot</span>(N, V);</span><br><span class="line">    <span class="type">float</span> NdotL = <span class="built_in">dot</span>(N, L);</span><br><span class="line">    <span class="type">float</span> ggx2 = GeometrySchlickGGX(NdotV, roughness);</span><br><span class="line">    <span class="type">float</span> ggx1 = GeometrySchlickGGX(NdotL, roughness);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ggx1 * ggx2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>然后按照指引注释掉engine的部分代码，就可以看到无KullaConty补偿的PBR结果：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_015.png"></p>
+<p>发现有些地方的效果奇怪，找了一下发现了问题，是Smith这里没有做点乘限制&gt;0，修改了一下</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_016.png"></p>
+<p>把实现粘贴到KullaConty的片元着色器Shader里面，解开注释：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_017.png"></p>
+<p>上方的KullaConty是还没着色的结果，还需要完成第二部分</p>
+<h3 id="2-完成KullaConty补偿"><a href="#2-完成KullaConty补偿" class="headerlink" title="2.完成KullaConty补偿"></a>2.完成KullaConty补偿</h3><h4 id="阅读框架-1"><a href="#阅读框架-1" class="headerlink" title="阅读框架"></a>阅读框架</h4><p>这部分指引非常明确，根据作业指引完成这部分，分析框架变量填入就好。</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_018.png"></p>
+<p>根据指引，在BRDF中添加需要求的Fadd*Fms，在函数中完成Fms的计算，Fmicro就是先前算好的微表面BRDF</p>
+<p>这里，Fms*Fadd的结果由函数MultiScatterBRDF来计算。</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_019.png"></p>
+<h4 id="计算FmsMulFadd"><a href="#计算FmsMulFadd" class="headerlink" title="计算FmsMulFadd"></a>计算FmsMulFadd</h4><p>计算公式如下：</p>
+<p>$ f_{ms}(\mu_o, \mu_i) &#x3D; \frac{(1 - E(\mu_o))(1 - E(\mu_i))}{\pi (1 - E_{\text{avg}})} $ </p>
+<p>$ f_{\text{add}} &#x3D; \frac{F_{\text{avg}} E_{\text{avg}}}{1 - F_{\text{avg}} (1 - E_{\text{avg}})} $</p>
+<p>一切变量名都给的很清晰，直接填入就好了。注意使用1.0而不是1</p>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">vec3</span> MultiScatterBRDF(<span class="type">float</span> NdotL, <span class="type">float</span> NdotV)</span><br><span class="line">&#123;</span><br><span class="line">  <span class="type">vec3</span> albedo = <span class="built_in">pow</span>(<span class="built_in">texture2D</span>(uAlbedoMap, vTextureCoord).rgb, <span class="type">vec3</span>(<span class="number">2.2</span>));</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> E_o = <span class="built_in">texture2D</span>(uBRDFLut, <span class="type">vec2</span>(NdotL, uRoughness)).xyz;</span><br><span class="line">  <span class="type">vec3</span> E_i = <span class="built_in">texture2D</span>(uBRDFLut, <span class="type">vec2</span>(NdotV, uRoughness)).xyz;</span><br><span class="line"></span><br><span class="line">  <span class="type">vec3</span> E_avg = <span class="built_in">texture2D</span>(uEavgLut, <span class="type">vec2</span>(<span class="number">0</span>, uRoughness)).xyz;</span><br><span class="line">  <span class="comment">// copper</span></span><br><span class="line">  <span class="type">vec3</span> edgetint = <span class="type">vec3</span>(<span class="number">0.827</span>, <span class="number">0.792</span>, <span class="number">0.678</span>);</span><br><span class="line">  <span class="type">vec3</span> F_avg = AverageFresnel(albedo, edgetint);</span><br><span class="line">  </span><br><span class="line">  <span class="type">vec3</span> Fadd = F_avg * E_avg / (<span class="number">1.0</span> - F_avg * (<span class="number">1.0</span> - E_avg));</span><br><span class="line">  <span class="comment">// <span class="doctag">TODO:</span> To calculate fms and missing energy here</span></span><br><span class="line">  <span class="type">vec3</span> Fms = (<span class="number">1.0</span> - E_o) * (<span class="number">1.0</span> - E_i) / (PI * (<span class="number">1.0</span> - E_avg));</span><br><span class="line">  <span class="keyword">return</span> Fms * Fadd;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到结果如下，非常成功。可以看到对于粗糙的材质，上方有补偿项的KullaConty-BRDF明显比下方亮。</p>
+<p>而对于右侧金属度高的材质，相对之下结果比较近似。</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_020.png"></p>
+<h2 id="Bonus：Split-Sum"><a href="#Bonus：Split-Sum" class="headerlink" title="Bonus：Split Sum"></a>Bonus：Split Sum</h2><p>如果不做重要性采样，这个效果就非常差，作业意义就不大，所以重要性采样应该算必做而非Bonus</p>
+<p>唯一的Bonus是使用Split Sum完成$ E(\mu) $的预计算</p>
+<p>个人理解，Split Sum意义在于极大加速积分过程</p>
+<p>注意此处的Split Sum和在第五课中的【Split Sum】完全不同：</p>
+<p>$ L_o(p, \omega_o) \approx<br>\frac{\int_{\Omega_{fr}} L_i(p, \omega_i) , d\omega_i}{\int_{\Omega_{fr}} d\omega_i}<br>\cdot<br>\int_{\Omega^+} f_r(p, \omega_i, \omega_o) \cos \theta_i , d\omega_i $</p>
+<p>此处的思想为，将F0拆出</p>
+<p>【<a target="_blank" rel="noopener" href="https://learnopengl-cn.github.io/07%20PBR/03%20IBL/02%20Specular%20IBL/#brdf">参考：LearnOpenGL</a>】</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_021.png"></p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_022.png"></p>
+<p>那么可以模仿OpenGL的实现，写出预计算代码。但是放到实时端还要其他的操作，修改BRDF计算函数等，这里就先跳过具体的实现（因为这里其实也云里雾里，不知道Split Sum有什么用）</p>
+<h1 id="附：总结与常见代码"><a href="#附：总结与常见代码" class="headerlink" title="附：总结与常见代码"></a>附：总结与常见代码</h1><p>对于渲染模型的选择，有两套体系：老式的经验模型，以及现在的PBR</p>
+<h1 id="渲染方程与BRDF"><a href="#渲染方程与BRDF" class="headerlink" title="渲染方程与BRDF"></a>渲染方程与BRDF</h1><p>渲染方程：结果&#x3D;自发光+积分{BRDF项 * 入射光 * 角度}</p>
+<p>$ L_o(\mathbf{x}, \mathbf{\omega_o}) &#x3D; L_e(\mathbf{x}, \mathbf{\omega_o}) + \int_{\Omega} f_r(\mathbf{x}, \mathbf{\omega_o}, \mathbf{\omega_i}) \cdot L_i(\mathbf{x}, \mathbf{\omega_i}) (\mathbf{n} \cdot \mathbf{\omega_i}) d\mathbf{\omega_i}<br> $</p>
+<p>那么我们重点就是要解决<strong>BRDF</strong>项，对于这个项有非常多的方案</p>
+<p><strong>BRDF （Bidirectional Reflectance Distribution Function）即双向反射分布函数</strong></p>
+<p>其定义了在给定的入射光方向和观察方向下，单位入射光束能量被反射到观察方向的比例  </p>
+<p><em><strong><font style="color:rgb(25, 27, 31);">描述的是入射光线经过某个表面反射后如何在各个出射方向上的分布</font></strong></em></p>
+<p><font style="color:rgb(25, 27, 31);">有两派模型：经验模型和物理模型</font></p>
+<p><font style="color:rgb(25, 27, 31);">对于经验模型，有很多种，以Blinn-Phong模型为代表</font></p>
+<p>对于物理模型，现在主流使用 Cook-Torrance BRDF <strong>微表面模型</strong></p>
+<h1 id="经验模型"><a href="#经验模型" class="headerlink" title="经验模型"></a>经验模型</h1><p>经验模型完全自成一派，由Lambert漫反射以及BlinnPhong模型为代表，是凭借经验的近似。</p>
+<p>color &#x3D; ambient + diffuse + specular</p>
+<p>经验模型是曾经很老旧的模型，现在很少见到使用了</p>
+<p>（当然，经验模型也可以整合进入BRDF，写成BRDF形式以统一，只是不符合物理规律）</p>
+<h1 id="物理模型（基于物理的渲染，PBR）"><a href="#物理模型（基于物理的渲染，PBR）" class="headerlink" title="物理模型（基于物理的渲染，PBR）"></a>物理模型（基于物理的渲染，PBR）</h1><p>PBR是现在主流、一统天下的解决方案，有成熟的工作流。是基于渲染方程理论依据的近似:</p>
+<h3 id="Cook-Torrance-BRDF"><a href="#Cook-Torrance-BRDF" class="headerlink" title="Cook-Torrance BRDF"></a>Cook-Torrance BRDF</h3><p>主流方案，认为BRDF项由 微表面法线分布函数NDF（D项）、几何遮蔽项（G项）和菲涅尔项（F项）归一化后组成，公式可以表示为如下：</p>
+<p><img src="/img/GAMES202/GAMES202_Part4_Real-timePhysically-basedMaterials-HW/GAMES202_Part4_Real-timePhysically-basedMaterials-HW_023.png"></p>
+<p>对于这里的F、G、D的选择，有很多不同的方案（不同的模型）：</p>
+<h4 id="F项-Fresnel反射项"><a href="#F项-Fresnel反射项" class="headerlink" title="F项-Fresnel反射项"></a>F项-Fresnel反射项</h4><p>通常使用一种：Schlick近似F项</p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Schlick近似的F项函数</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">FresnelSchlick</span>(<span class="params"><span class="built_in">float</span> NdotH, <span class="built_in">float</span> F0</span>)</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> F0 + (<span class="number">1.0f</span> - F0) * pow(<span class="number">1.0f</span> - NdotH, <span class="number">5.0f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="G项-Gemotry几何遮蔽项"><a href="#G项-Gemotry几何遮蔽项" class="headerlink" title="G项-Gemotry几何遮蔽项"></a>G项-Gemotry几何遮蔽项</h4><p>通常使用Smith近似，对于不同的NDF，配套不同的Smith近似函数</p>
+<p><font style="color:rgb(25, 27, 31);">[</font><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/81708753">浅墨的游戏编程</a><font style="color:rgb(25, 27, 31);">]：Smith遮蔽函数的每个法线分布函数会导出不同的Λ（lambda）函数。需要注意，仅具有形状不变性的法线分布函数（如GGX、Beckmann）可以导出具有解析形式的Λ函数，而且不具备形状不变性的函数（Blinn-Phong），则Λ不存在解析形式</font></p>
+<p><font style="color:rgb(25, 27, 31);">在文章2.4节有更详细的讲述，不同的Smith近似的类别</font></p>
+<figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 调用该G2函数，为GGX模型配套的G项Smith</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">GeometrySmith</span>(<span class="params"><span class="built_in">float</span> roughness, <span class="built_in">float</span> NoV, <span class="built_in">float</span> NoL</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">float</span> ggx2 = GeometrySchlickGGX(NoV, roughness);</span><br><span class="line">    <span class="built_in">float</span> ggx1 = GeometrySchlickGGX(NoL, roughness);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> ggx1 * ggx2;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// G1函数</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">GeometrySchlickGGX</span>(<span class="params"><span class="built_in">float</span> NdotV, <span class="built_in">float</span> roughness</span>)</span> &#123;</span><br><span class="line">    <span class="built_in">float</span> a = roughness;</span><br><span class="line">    <span class="built_in">float</span> k = (a * a) / <span class="number">2.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">float</span> nom = NdotV;</span><br><span class="line">    <span class="built_in">float</span> denom = NdotV * (<span class="number">1.0f</span> - k) + k;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nom / denom;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="D项-NDF微表面法线分布函数"><a href="#D项-NDF微表面法线分布函数" class="headerlink" title="D项-NDF微表面法线分布函数"></a>D项-NDF微表面法线分布函数</h4><p>通常有两种：GGX分布和Beckmann分布</p>
+<h5 id="GGX模型"><a href="#GGX模型" class="headerlink" title="GGX模型"></a>GGX模型</h5><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">float</span> <span class="title">DistributionGGX</span><span class="params">(Vec3f N, Vec3f H, <span class="type">float</span> roughness)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">float</span> a = roughness*roughness;</span><br><span class="line">    <span class="type">float</span> a2 = a*a;</span><br><span class="line">    <span class="type">float</span> NdotH = std::<span class="built_in">max</span>(<span class="built_in">dot</span>(N, H), <span class="number">0.0f</span>);</span><br><span class="line">    <span class="type">float</span> NdotH2 = NdotH*NdotH;</span><br><span class="line"></span><br><span class="line">    <span class="type">float</span> nom   = a2;</span><br><span class="line">    <span class="type">float</span> denom = (NdotH2 * (a2 - <span class="number">1.0</span>) + <span class="number">1.0</span>);</span><br><span class="line">    denom = PI * denom * denom;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> nom / std::<span class="built_in">max</span>(denom, <span class="number">0.0001f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="Beckmann模型"><a href="#Beckmann模型" class="headerlink" title="Beckmann模型"></a>Beckmann模型</h5><figure class="highlight csharp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// [Beckmann 1963, &quot;The scattering of electromagnetic waves from rough surfaces&quot;]</span></span><br><span class="line"><span class="function"><span class="built_in">float</span> <span class="title">D_Beckmann</span>(<span class="params"> <span class="built_in">float</span> a2, <span class="built_in">float</span> NoH </span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">float</span> NoH2 = NoH * NoH;</span><br><span class="line">    <span class="keyword">return</span> exp( (NoH2 - <span class="number">1</span>) / (a2 * NoH2) ) / ( PI * a2 * NoH2 * NoH2 );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+                
+            </div>
+
+            <!-- Comments -->
+            
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    
+
+
+                </div>
+            
+        </div>
+    </div>
+</article>
+
+    <!-- Footer -->
+    <hr />
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    
+
+                    
+
+                    
+                        <li>
+                            <a href="https://github.com/EauDouceFish" target="_blank">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                            </a>
+                        </li>
+                    
+
+                    
+
+                    
+
+                    
+                </ul>
+                <p class="copyright text-muted">&copy; 2025 EauDouceFish<br></p>
+                <p class="copyright text-muted">Original Theme <a target="_blank" href="http://startbootstrap.com/template-overviews/clean-blog/">Clean Blog</a> from <a href="http://startbootstrap.com/" target="_blank">Start Bootstrap</a></p>
+                <p class="copyright text-muted">Adapted for <a target="_blank" href="https://hexo.io/">Hexo</a> by <a href="http://www.codeblocq.com/" target="_blank">Jonathan Klughertz</a></p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+    <!-- After footer scripts -->
+    
+<!-- jQuery -->
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<!-- Gallery -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/featherlight/1.3.5/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<!-- Disqus Comments -->
+
+
+
+</body>
+
+</html>
